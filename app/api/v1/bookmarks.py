@@ -1,21 +1,25 @@
 from fastapi import APIRouter
 
+from app.models.dtos.bookmarks import BookmarkListOut, BookmarkOut, BookmarkIn
+from app.repositories import bookmarks as bookmark_repo
 
 bookmark_router = APIRouter(prefix="/bookmarks")
 
-@bookmark_router.get("/{user_id}")
-async def list_bookmarks_by_user(user_id: int):
-  return "hello bookarks"
+
+@bookmark_router.get("/{member_id}", response_model=BookmarkListOut)
+async def list_bookmarks_by_user(member_id: int):
+    bookmarks = await bookmark_repo.get_bookmarks_by_member_id(member_id=member_id)
+    return BookmarkListOut(
+            bookmarks=[BookmarkOut(**bookmark) for bookmark in bookmarks],
+            bookmarks_count=len(bookmarks)
+    )
 
 
+@bookmark_router.post("/", response_model=BookmarkOut, status_code=201)
+async def create_bookmark(payload: BookmarkIn):
+    bookmark_id = await bookmark_repo.post(payload)
 
-@bookmark_router.post("/{user_id}")
-async def create_bookmarks_by_user(user_id: int):
-  pass
-
-# response_model=PetOut
-# return await pet_crud.select_pets_by_user_id(user_id)
-# return await pet_crud.insert_pet_by_user_id(item, user_id)
-  
-  
-
+    return BookmarkOut(id=bookmark_id,
+                       member_id=payload.member_id,
+                       title=payload.title,
+                       url=payload.url)

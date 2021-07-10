@@ -1,0 +1,26 @@
+
+version: '3.8'
+
+services:
+  web:
+    build: ./
+    command: |
+      bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000'
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 8002:8000
+    environment:
+      - DATABASE_URL=postgresql://tidify:tidify1!@db/tidify_sdb
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=tidify
+      - POSTGRES_PASSWORD=tidify1!
+      - POSTGRES_DB=tidify_sdb
+volumes:
+  postgres_data:
