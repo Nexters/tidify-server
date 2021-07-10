@@ -3,7 +3,8 @@ from fastapi_pagination import add_pagination
 from starlette.middleware.cors import CORSMiddleware
 from app.core.config import Settings
 
-# from app.app1.api.v1_api import router as app1_v1_router
+from app.api.v1_api import router as v1_router
+
 
 
 def get_application(settings: Settings) -> FastAPI:
@@ -18,8 +19,7 @@ def get_application(settings: Settings) -> FastAPI:
                 allow_headers=["*"],
         )
 
-    # _app.include_router(app1_v1_router)
-    # _app.include_router(app2_v1_router)
+    _app.include_router(v1_router)
 
     add_pagination(_app)
 

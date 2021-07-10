@@ -1,2 +1,6 @@
 # tidify-server
-Team Testo's bookmark server(tidify)
+> Team Testo bookmark server(tidify)
+
+
+## setup
+`uvicorn app.main:app --reload --log-level=debug`
