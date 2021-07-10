@@ -7,7 +7,7 @@ bookmark_router = APIRouter(prefix="/bookmarks")
 
 
 @bookmark_router.get("/{member_id}", response_model=BookmarkListOut)
-async def list_bookmarks_by_user(member_id: int):
+async def list_bookmarks_by_member(member_id: int):
     bookmarks = await bookmark_repo.get_bookmarks_by_member_id(member_id=member_id)
     return BookmarkListOut(
             bookmarks=[BookmarkOut(**bookmark) for bookmark in bookmarks],
