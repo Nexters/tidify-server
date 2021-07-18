@@ -6,7 +6,11 @@
 `uvicorn app.main:app --reload --log-level=debug`
 
 ```
-$ heroku login
+$ heroku git:remote -a tidify
+$ heroku container:login
+$ heroku container:push web
+$ heroku container:release web
+$ heroku open
 ```
 
 ## TODO

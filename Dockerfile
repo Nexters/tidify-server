@@ -22,3 +22,7 @@ RUN set -eux \
 
 # copy project
 COPY . /usr/src/app/
+
+# Run the app.  CMD is required to run on Heroku
+# $PORT is set by Heroku
+CMD uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port $PORT
