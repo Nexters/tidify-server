@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from app.models.common import DateTimeModelMixin, IDModelMixin
+from src.app.models.common import DateTimeModelMixin, IDModelMixin
 
 
 class Bookmark(IDModelMixin, DateTimeModelMixin, BaseModel):

@@ -1,9 +1,14 @@
 # tidify-server
 > Team Testo bookmark server(tidify)
 
+## dev
+```bash
+$ docker compose -f docker-compose.dev.yml up
+$ python src/main.py
+$ docker compose -f docker-compose.dev.yml down --rmi local 
+```
 
-## setup
-`uvicorn app.main:app --reload --log-level=debug`
+## sandbox setup
 
 ```
 $ heroku git:remote -a tidify

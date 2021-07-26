@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.models.dtos.bookmarks import BookmarkListOut, BookmarkOut, BookmarkIn
-from app.repositories import bookmarks as bookmark_repo
+from src.app.models.dtos.bookmarks import BookmarkListOut, BookmarkOut, BookmarkIn
+from src.app.repositories import bookmarks as bookmark_repo
 
 bookmark_router = APIRouter(prefix="/bookmarks")
 

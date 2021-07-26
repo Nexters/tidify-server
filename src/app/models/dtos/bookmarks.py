@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from app.models.domain.bookmarks import Bookmark
+from src.app.models.domain.bookmarks import Bookmark
 
 
 class BookmarkIn(BaseModel):
