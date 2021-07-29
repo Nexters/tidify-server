@@ -2,11 +2,11 @@ from sqlalchemy import (
     Column,
     Integer,
     DateTime,
-    func,
+    func, String,
 )
 from sqlalchemy.orm import Session
 
-from src.database.conn import db
+from database.conn import db, Base
 
 
 class BaseMixin:
@@ -162,3 +162,11 @@ class BaseMixin:
             self._session.close()
         else:
             self._session.flush()
+
+
+class Bookmarks(Base, BaseMixin):
+    __tablename__ = "bookmarks"
+
+    Column("member_id", Integer)
+    Column("title", String(50))
+    Column("url", String(1000))

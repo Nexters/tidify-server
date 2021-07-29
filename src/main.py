@@ -4,12 +4,11 @@ from os import environ
 import uvicorn
 from fastapi import FastAPI
 from fastapi.security import APIKeyHeader
-from pydantic import PostgresDsn
 from starlette.middleware.cors import CORSMiddleware  # noqa
 
 from app.api.v1_api import v1_router
+from core.config import get_conf
 from database.conn import db
-from src.core.config import get_conf
 
 API_KEY_HEADER = APIKeyHeader(name="Authorization", auto_error=False)
 

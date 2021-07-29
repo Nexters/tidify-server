@@ -30,6 +30,7 @@ class Config:
             password="tidify1!",
             path="/tidify_dev",
     )
+    DB_URL: str = environ.get("DB_URL", "mysql+pymysql://tidify:tidify1!@127.0.0.1/tidify?charset=utf8mb4")
 
 
 @dataclass

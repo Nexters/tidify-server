@@ -97,3 +97,4 @@ class SQLAlchemy:
 
 db = SQLAlchemy()
 Base = declarative_base()
+# TODO: script table schema 생성

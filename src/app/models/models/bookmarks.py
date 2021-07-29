@@ -2,8 +2,6 @@ from typing import List
 
 from pydantic import BaseModel
 
-from src.app.models.domain.bookmarks import Bookmark
-
 
 class BookmarkIn(BaseModel):
     member_id: int
@@ -11,8 +9,14 @@ class BookmarkIn(BaseModel):
     url: str
 
 
-class BookmarkOut(Bookmark):
-    pass
+class BookmarkOut(BaseModel):
+    id: int
+    member_id: str
+    title: str
+    url: str
+
+    class Config:
+        orm_mode = True
 
 
 class BookmarkListOut(BaseModel):
