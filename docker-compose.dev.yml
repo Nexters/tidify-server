@@ -3,38 +3,34 @@ volumes:
   postgres:
   pgadmin:
 services:
-  db:
-    container_name: db
+  postgres:
+    container_name: postgres
     image: postgres:13-alpine
     environment:
-      POSTGRES_SERVER: db
       POSTGRES_USER: "tidify"
       POSTGRES_PASSWORD: "tidify1!"
-      POSTGRES_DB: "tidify_dev"
+      POSTGRES_DB: "tidify"
       PGDATA: "/data/postgres"
     volumes:
       - postgres:/var/lib/postgresql/data/
-#      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
-#  pgadmin:
-#    container_name: demo_pgadmin
-#    image: "dpage/pgadmin4:4.24"
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: admin
-#      PGADMIN_DEFAULT_PASSWORD: admin
-#      PGADMIN_CONFIG_SERVER_MODE: "False"
-#      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-#    volumes:
-#      - pgadmin:/var/lib/pgadmin
-#      - ./docker_pgadmin_servers.json:/pgadmin4/servers.json
-#    ports:
-#      - "15433:80"
-#    entrypoint:
-#      - "/bin/sh"
-#      - "-c"
-#      - "/bin/echo 'postgres:5432:*:postgres:password' > /tmp/pgpassfile && chmod 600 /tmp/pgpassfile && /entrypoint.sh"
-#    restart: unless-stopped
-
-
-
+  pgadmin:
+    container_name: pgadmin
+    image: "dpage/pgadmin4:5.5"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+      - ./docker_pgadmin_servers.json:/pgadmin4/servers.json
+    ports:
+      - "5555:80"
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+      - "/bin/echo 'postgres:5432:*:postgres:password' > /tmp/pgpassfile && chmod 600 /tmp/pgpassfile && /entrypoint.sh"
+    restart: unless-stopped

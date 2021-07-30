@@ -11,8 +11,8 @@ from database.conn import db, Base
 
 class BaseMixin:
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, nullable=False, default=func.utc_timestamp())
-    updated_at = Column(DateTime, nullable=False, default=func.utc_timestamp(), onupdate=func.utc_timestamp())
+    created_at = Column(DateTime, nullable=False, default=func.now())
+    updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
 
     def __init__(self):
         self._q = None
@@ -167,6 +167,6 @@ class BaseMixin:
 class Bookmarks(Base, BaseMixin):
     __tablename__ = "bookmarks"
 
-    Column("member_id", Integer)
-    Column("title", String(50))
-    Column("url", String(1000))
+    member_id = Column("member_id", Integer)
+    title = Column("title", String(50))
+    url = Column("url", String(1000))

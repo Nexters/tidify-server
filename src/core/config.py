@@ -23,14 +23,14 @@ class Config:
     DB_ECHO: bool = True  # dev
     DEBUG: bool = False
     TEST_MODE: bool = False
+    # DB_URL: str = environ.get("DB_URL", "mysql+pymysql://tidify:tidify1!@127.0.0.1/tidify?charset=utf8mb4")
     DB_URL: str = PostgresDsn.build(
             scheme="postgresql",
             host="localhost",
             user="tidify",
             password="tidify1!",
-            path="/tidify_dev",
+            path="/tidify",
     )
-    DB_URL: str = environ.get("DB_URL", "mysql+pymysql://tidify:tidify1!@127.0.0.1/tidify?charset=utf8mb4")
 
 
 @dataclass
@@ -48,7 +48,7 @@ class ProdConfig(Config):
 
 @dataclass
 class TestConfig(Config):
-    DB_URL: str = "mysql+pymysql://travis@localhost/notification_test?charset=utf8mb4"
+    DB_URL: str = "mysql+pymysql://travis@localhost/notification_test?charset=utf8mb4" # TODO: test 로컬 환경 생성
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     TEST_MODE: bool = True

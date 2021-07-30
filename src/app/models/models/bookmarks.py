@@ -11,7 +11,7 @@ class BookmarkIn(BaseModel):
 
 class BookmarkOut(BaseModel):
     id: int
-    member_id: str
+    member_id: int
     title: str
     url: str
 

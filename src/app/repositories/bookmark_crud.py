@@ -9,10 +9,5 @@ async def create_bookmark(session: Session, payload: BookmarkIn):
                             title=payload.title)
 
 
-async def get_bookmarks_by_member_id(member_id: int):
-    return 1
-    # query = bookmarks.select().where(member_id == bookmarks.c.member_id)
-    # return await database.fetch_all(query=query)
-
-
-
+async def get_bookmarks_by_member_id(session: Session, member_id: int):
+    return Bookmarks.filter(session=session, member_id=member_id).all()
