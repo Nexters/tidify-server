@@ -3,6 +3,7 @@ from sqlalchemy import (
     Integer,
     DateTime,
     func, String,
+    Enum,
 )
 from sqlalchemy.orm import Session
 
@@ -170,3 +171,12 @@ class Bookmarks(Base, BaseMixin):
     member_id = Column("member_id", Integer)
     title = Column("title", String(50))
     url = Column("url", String(1000))
+
+
+class Users(Base, BaseMixin):
+    __tablename__ = "users"
+    status = Column(Enum("active", "deleted", "blocked"), default="active")
+    email = Column(String(length=255), nullable=True)
+    name = Column(String(length=255), nullable=True)
+    profile_img = Column(String(length=1000), nullable=True)
+    sns_type = Column(Enum("facebook", "google", "kakao"), nullable=True)
