@@ -10,6 +10,8 @@ from starlette.responses import JSONResponse
 from app.models.models.users import UserToken
 from core import consts
 from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST
+from core.errors import exceptions
+from core.errors.exceptions import SqlFailureError, APIException
 from core.utils.date_utils import D
 from core.utils.logger import api_logger
 
@@ -36,9 +38,9 @@ async def access_control(request: Request, call_next):
     try:
         if url.startswith("/api"):
             if "authorization" not in headers.keys():
-                raise ex.NotAuthorized()
+                raise exceptions.NotAuthorized()
             if "Authorization" not in headers.keys():
-                raise ex.NotAuthorized()
+                raise exceptions.NotAuthorized()
             token_info = await _token_decode(access_token=headers.get("Authorization"))
             request.state.user = UserToken(**token_info)
         response = await call_next(request)
@@ -68,16 +70,16 @@ async def _token_decode(access_token):
         access_token = access_token.replace("Bearer ", "")
         payload = jwt.decode(access_token, key=consts.JWT_SECRET, algorithms=[consts.JWT_ALGORITHM])
     except ExpiredSignatureError:
-        raise ex.TokenExpiredEx()
+        raise exceptions.TokenExpiredEx()
     except DecodeError:
-        raise ex.TokenDecodeEx()
+        raise exceptions.TokenDecodeEx()
     return payload
 
 
 async def _exception_handler(error: Exception):
     print(error)
     if isinstance(error, sqlalchemy.exc.OperationalError):
-        error = SqlFailureEx(ex=error)
+        error = SqlFailureError(ex=error)
     if not isinstance(error, APIException):
         error = APIException(ex=error, detail=str(error))
     return error
