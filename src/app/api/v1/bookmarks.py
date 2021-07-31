@@ -51,3 +51,13 @@ async def update_bookmark(
     bookmark = await bookmark_crud.update_bookmark(session, user_id, bookmark_id, bookmark_in)
     return BookmarkResponse(**bookmark.dict())
 
+
+@bookmark_router.delete("/{bookmark_id}", status_code=204)
+async def delete_bookmark(
+        bookmark_id: int = __valid_id,
+        session: Session = Depends(db.session)
+) -> None:
+    bookmark = Bookmarks.filter(session=session, id=bookmark_id)
+    if not bookmark.first():
+        raise exceptions.BookmarkNotFoundException(bookmark_id=bookmark_id)
+    bookmark.delete(auto_commit=True)

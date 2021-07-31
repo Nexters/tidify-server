@@ -75,6 +75,17 @@ class UnAuthorizedException(APIException):
         )
 
 
+class BookmarkNotFoundException(APIException):
+    def __init__(self, bookmark_id: int, ex: Exception = None):
+        super().__init__(
+                msg=f"{bookmark_id}에 해당하는 북마크가 없습니다",
+                status_code=StatusCode.HTTP_404,
+                detail="Bookmark Not Found Error",
+                code=f"{StatusCode.HTTP_404}{'1'.zfill(4)}",
+                ex=ex,
+        )
+
+
 class SqlFailureException(APIException):
     def __init__(self, ex: Exception = None):
         super().__init__(
