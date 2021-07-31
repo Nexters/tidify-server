@@ -35,3 +35,12 @@ app = create_app(env)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
+
+
+@app.get("/")
+async def index():
+    """
+    health check API
+    """
+    current_time = datetime.utcnow()
+    return Response(f"Tidify Server (UTC: {current_time.strftime('%Y.%m.%d %H:%M:%S')})")
