@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from starlette.requests import Request  # noqa
 
 from app.models.models.bookmarks import BookmarkListOut, BookmarkOut, BookmarkIn
-from app.repositories import bookmark_crud
+from app.crud import bookmark_crud
 from database.conn import db
 
 bookmark_router = APIRouter(prefix="/bookmarks")
