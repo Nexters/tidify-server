@@ -1,30 +1,53 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 from sqlalchemy.orm import Session
 from starlette.requests import Request  # noqa
 
-from app.models.models.bookmarks import BookmarkListOut, BookmarkOut, BookmarkIn
+from app.models.models.bookmarks import BookmarkListResponse, BookmarkResponse, BookmarkCreateRequest, \
+    BookmarkUpdateRequest
 from app.crud import bookmark_crud
+from core.errors import exceptions
 from database.conn import db
+from database.schema import Bookmarks
 
 bookmark_router = APIRouter(prefix="/bookmarks")
+__valid_id = Path(..., title="The ID of bookmark to get", ge=0)
 
 
-@bookmark_router.get("/{member_id}", response_model=BookmarkListOut)
-async def list_bookmarks_by_member(request: Request, member_id: int, session: Session = Depends(db.session)):
-    bookmarks = await bookmark_crud.get_bookmarks_by_member_id(session, member_id=member_id)
-    return BookmarkListOut(
-            bookmarks=[BookmarkOut(id=bookmark.id,
-                                   member_id=bookmark.member_id,
-                                   title=bookmark.title,
-                                   url=bookmark.url) for bookmark in bookmarks],
+@bookmark_router.get("/", response_model=BookmarkListResponse)
+async def list_bookmarks_by_member(
+        request: Request,
+        session: Session = Depends(db.session)
+) -> BookmarkListResponse:
+    # TODO: pagination
+    bookmarks = await bookmark_crud.get_bookmarks_by_user_id(session, user_id=request.state.user.id)
+    return BookmarkListResponse(
+            bookmarks=[BookmarkResponse(id=bookmark.id,
+                                        user_id=bookmark.user_id,
+                                        title=bookmark.title,
+                                        url=bookmark.url) for bookmark in bookmarks],
             bookmarks_count=len(bookmarks)
     )
 
 
-@bookmark_router.post("/", response_model=BookmarkOut, status_code=201)
-async def create_bookmark(request: Request, payload: BookmarkIn, session: Session = Depends(db.session)):
-    bookmark = await bookmark_crud.create_bookmark(session, payload)
-    return BookmarkOut(id=bookmark.id,
-                       member_id=payload.member_id,
-                       title=payload.title,
-                       url=payload.url)
+@bookmark_router.post("/", response_model=BookmarkResponse, status_code=201)
+async def create_bookmark(
+        request: Request,
+        bookmark_in: BookmarkCreateRequest,
+        session: Session = Depends(db.session)
+) -> BookmarkResponse:
+    user_id = request.state.user.id
+    bookmark = await bookmark_crud.create_bookmark(session, user_id, bookmark_in)
+    return BookmarkResponse(**bookmark.dict())
+
+
+@bookmark_router.patch("/{bookmark_id}", response_model=BookmarkResponse, status_code=201)
+async def update_bookmark(
+        request: Request,
+        bookmark_in: BookmarkUpdateRequest,
+        bookmark_id: int = __valid_id,
+        session: Session = Depends(db.session)
+) -> BookmarkResponse:
+    user_id = request.state.user.id
+    bookmark = await bookmark_crud.update_bookmark(session, user_id, bookmark_id, bookmark_in)
+    return BookmarkResponse(**bookmark.dict())
+

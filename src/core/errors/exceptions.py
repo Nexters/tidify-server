@@ -31,7 +31,7 @@ class APIException(Exception):
         super().__init__(ex)
 
 
-class UserNotFoundError(APIException):
+class UserNotFoundException(APIException):
     def __init__(self, user_id: int = None, ex: Exception = None):
         super().__init__(
                 status_code=StatusCode.HTTP_404,
@@ -42,7 +42,29 @@ class UserNotFoundError(APIException):
         )
 
 
-class UnAuthorizedError(APIException):
+class TokenExpiredException(APIException):
+    def __init__(self, ex: Exception = None):
+        super().__init__(
+                status_code=StatusCode.HTTP_400,
+                msg=f"세션이 만료되어 로그아웃 되었습니다.",
+                detail="Token Expired",
+                code=f"{StatusCode.HTTP_400}{'2'.zfill(4)}",
+                ex=ex,
+        )
+
+
+class TokenDecodeException(APIException):
+    def __init__(self, ex: Exception = None):
+        super().__init__(
+                status_code=StatusCode.HTTP_400,
+                msg=f"비정상적인 접근입니다.",
+                detail="Token has been compromised.",
+                code=f"{StatusCode.HTTP_400}{'3'.zfill(4)}",
+                ex=ex,
+        )
+
+
+class UnAuthorizedException(APIException):
     def __init__(self, ex: Exception = None):
         super().__init__(
                 status_code=StatusCode.HTTP_401,
@@ -53,34 +75,12 @@ class UnAuthorizedError(APIException):
         )
 
 
-class TokenExpiredError(APIException):
-    def __init__(self, ex: Exception = None):
-        super().__init__(
-                status_code=StatusCode.HTTP_400,
-                msg=f"세션이 만료되어 로그아웃 되었습니다.",
-                detail="Token Expired",
-                code=f"{StatusCode.HTTP_400}{'1'.zfill(4)}",
-                ex=ex,
-        )
-
-
-class TokenDecodeError(APIException):
-    def __init__(self, ex: Exception = None):
-        super().__init__(
-                status_code=StatusCode.HTTP_400,
-                msg=f"비정상적인 접근입니다.",
-                detail="Token has been compromised.",
-                code=f"{StatusCode.HTTP_400}{'2'.zfill(4)}",
-                ex=ex,
-        )
-
-
-class SqlFailureError(APIException):
+class SqlFailureException(APIException):
     def __init__(self, ex: Exception = None):
         super().__init__(
                 status_code=StatusCode.HTTP_500,
                 msg=f"이 에러는 서버측 에러 입니다. 자동으로 리포팅 되며, 빠르게 수정하겠습니다.",
                 detail="Internal Server Error",
-                code=f"{StatusCode.HTTP_500}{'2'.zfill(4)}",
+                code=f"{StatusCode.HTTP_500}{'1'.zfill(4)}",
                 ex=ex,
         )

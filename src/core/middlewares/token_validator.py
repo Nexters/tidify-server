@@ -11,7 +11,7 @@ from app.models.models.users import UserToken
 from core import consts
 from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST
 from core.errors import exceptions
-from core.errors.exceptions import SqlFailureError, APIException
+from core.errors.exceptions import SqlFailureException, APIException
 from core.utils.date_utils import D
 from core.utils.logger import api_logger
 
@@ -38,7 +38,7 @@ async def access_control(request: Request, call_next):
         if url.startswith("/api"):
             access_token = _get_access_token_from_header(headers)
             if not access_token:
-                raise exceptions.UnAuthorizedError()
+                raise exceptions.UnAuthorizedException()
             token_info = await _token_decode(access_token=access_token)
             request.state.user = UserToken(**token_info)
         response = await call_next(request)
@@ -83,7 +83,7 @@ async def _token_decode(access_token):
 async def _exception_handler(error: Exception):
     print(error)
     if isinstance(error, sqlalchemy.exc.OperationalError):
-        error = SqlFailureError(ex=error)
+        error = SqlFailureException(ex=error)
     if not isinstance(error, APIException):
         error = APIException(ex=error, detail=str(error))
     return error

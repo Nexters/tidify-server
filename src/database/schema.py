@@ -167,8 +167,7 @@ class BaseMixin:
 
 class Bookmarks(Base, BaseMixin):
     __tablename__ = "bookmarks"
-
-    member_id = Column("member_id", Integer)
+    user_id = Column("user_id", Integer)
     title = Column("title", String(50))
     url = Column("url", String(1000))
 
