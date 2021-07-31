@@ -10,7 +10,7 @@ from database.conn import db
 from database.schema import Bookmarks
 
 bookmark_router = APIRouter(prefix="/bookmarks")
-__valid_id = Path(..., title="The ID of bookmark to get", ge=0)
+__valid_id = Path(..., title="The ID of bookmark to get", ge=1)
 
 
 @bookmark_router.get("/", response_model=BookmarkListResponse)
