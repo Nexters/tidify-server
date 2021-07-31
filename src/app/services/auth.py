@@ -6,7 +6,7 @@ from app.models.models.users import UserInput
 from core.consts import JWT_SECRET, JWT_ALGORITHM
 
 
-def create_access_token(user_input: UserInput, expires_delta: int = None):
+def create_access_token(user_input: UserInput, expires_delta: int = None): # TODO: exp
     to_encode = user_input.dict()
     # if expires_delta:
     #     to_encode.update({"exp": datetime.utcnow() + timedelta(hours=expires_delta)})
