@@ -34,14 +34,12 @@ async def access_control(request: Request, call_next):
             await api_logger(request=request, response=response)
         return response
 
-    # TODO: 로직 리팩토링
     try:
         if url.startswith("/api"):
-            if "authorization" not in headers.keys():
-                raise exceptions.NotAuthorized()
-            if "Authorization" not in headers.keys():
-                raise exceptions.NotAuthorized()
-            token_info = await _token_decode(access_token=headers.get("Authorization"))
+            access_token = _get_access_token_from_header(headers)
+            if not access_token:
+                raise exceptions.UnAuthorizedError()
+            token_info = await _token_decode(access_token=access_token)
             request.state.user = UserToken(**token_info)
         response = await call_next(request)
         await api_logger(request=request, response=response)
@@ -50,8 +48,14 @@ async def access_control(request: Request, call_next):
         error_dict = dict(status=error.status_code, msg=error.msg, detail=error.detail, code=error.code)
         response = JSONResponse(status_code=error.status_code, content=error_dict)
         await api_logger(request=request, error=error)
-
     return response
+
+
+def _get_access_token_from_header(headers):
+    auth_code = headers.get("Authorization")
+    if not auth_code:
+        auth_code = headers.get("authorization")
+    return auth_code
 
 
 async def _url_pattern_check(path, pattern):

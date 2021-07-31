@@ -176,7 +176,7 @@ class Bookmarks(Base, BaseMixin):
 class Users(Base, BaseMixin):
     __tablename__ = "users"
     status = Column(Enum("active", "deleted", "blocked"), default="active")
-    email = Column(String(length=255), nullable=True)
+    email = Column(String(length=255), nullable=True, unique=True)
     name = Column(String(length=255), nullable=True)
     profile_img = Column(String(length=1000), nullable=True)
     sns_type = Column(Enum("facebook", "google", "kakao"), nullable=True)

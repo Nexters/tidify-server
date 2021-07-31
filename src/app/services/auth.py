@@ -2,12 +2,12 @@ import jwt
 import requests
 
 from app.models.models.kakao import KakaoUserMeResponse
-from app.models.models.users import UserInput
+from app.models.models.users import UserToken
 from core.consts import JWT_SECRET, JWT_ALGORITHM
 
 
-def create_access_token(user_input: UserInput, expires_delta: int = None): # TODO: exp
-    to_encode = user_input.dict()
+def create_access_token(user_token: UserToken, expires_delta: int = None):  # TODO: exp
+    to_encode = user_token.dict()
     # if expires_delta:
     #     to_encode.update({"exp": datetime.utcnow() + timedelta(hours=expires_delta)})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
@@ -65,6 +65,6 @@ async def get_kakao_user_profile(access_token: str) -> KakaoUserMeResponse:
     except Exception as e:
         print(e)
         # logger.warning(e)
-        # raise ex.KakaoMeEx
+        # raise exceptions.KakaoMeEx
     print(res.json())
     return KakaoUserMeResponse(**res.json())
