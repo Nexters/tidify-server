@@ -16,7 +16,7 @@ config = context.config
 fileConfig(config.config_file_name)
 
 from database.conn import Base
-from database.schema import *
+from database.schema import *  # noqa
 
 target_metadata = Base.metadata
 
