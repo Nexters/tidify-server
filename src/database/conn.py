@@ -4,23 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import logging
 
-def _database_exist(engine, schema_name):
-    query = f"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{schema_name}'"
-    with engine.connect() as conn:
-        result_proxy = conn.execute(query)
-        result = result_proxy.scalar()
-        return bool(result)
-
-
-def _drop_database(engine, schema_name):
-    with engine.connect() as conn:
-        conn.execute(f"DROP DATABASE {schema_name};")
-
-
-def _create_database(engine, schema_name):
-    with engine.connect() as conn:
-        conn.execute(f"CREATE DATABASE {schema_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;")
-
 
 class SQLAlchemy:
     def __init__(self, app: FastAPI = None, **kwargs):
@@ -38,28 +21,17 @@ class SQLAlchemy:
         """
         database_url = kwargs.get("DB_URL")
         pool_recycle = kwargs.setdefault("DB_POOL_RECYCLE", 900)
-        is_testing = kwargs.setdefault("TEST_MODE", False)
         echo = kwargs.setdefault("DB_ECHO", True)
 
         self._engine = create_engine(
-            database_url,
-            echo=echo,
-            pool_recycle=pool_recycle,
-            pool_pre_ping=True,
+                database_url,
+                echo=echo,
+                pool_recycle=pool_recycle,
+                pool_pre_ping=True,
         )
-        if is_testing:  # create schema
-            db_url = self._engine.url
-            if db_url.host != "localhost":
-                raise Exception("db host must be 'localhost' in test environment")
-            except_schema_db_url = f"{db_url.drivername}://{db_url.username}@{db_url.host}"
-            schema_name = db_url.database
-            temp_engine = create_engine(except_schema_db_url, echo=echo, pool_recycle=pool_recycle, pool_pre_ping=True)
-            if _database_exist(temp_engine, schema_name):
-                _drop_database(temp_engine, schema_name)
-            _create_database(temp_engine, schema_name)
-            temp_engine.dispose()
 
         self._session = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
+        # Base.metadata.create_all(bind=self._engine)
 
         @app.on_event("startup")
         def startup():
@@ -97,4 +69,3 @@ class SQLAlchemy:
 
 db = SQLAlchemy()
 Base = declarative_base()
-# TODO: script table schema 생성

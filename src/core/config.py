@@ -1,10 +1,10 @@
+import os
 from dataclasses import dataclass
-from os import path
 
-from pydantic import PostgresDsn
+from dotenv import load_dotenv  # noqa
 
-base_dir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))  # tidify-server
-
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tidify-server
+load_dotenv(os.path.join(_BASE_DIR, ".env"))  # TODO: phase 분리, phase별로 env 네이밍 변경
 
 
 # POSTGRES_HOST = os.getenv("POSTGRES_HOST")
@@ -16,18 +16,11 @@ base_dir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))  # t
 
 @dataclass
 class Config:
-    BASE_DIR: str = base_dir
     DB_POOL_RECYCLE: int = 900
     DB_ECHO: bool = True  # dev
     DEBUG: bool = False
     TEST_MODE: bool = False
-    DB_URL: str = PostgresDsn.build(
-            scheme="postgresql",
-            host="localhost",
-            user="tidify",
-            password="tidify1!",
-            path="/tidify",
-    )
+    DB_URL: str = os.getenv("DATABASE_URL")
 
 
 @dataclass

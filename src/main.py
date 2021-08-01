@@ -5,9 +5,9 @@ from os import environ
 import uvicorn
 from fastapi import FastAPI
 from fastapi.security import APIKeyHeader
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware  # noqa
 from starlette.middleware.cors import CORSMiddleware  # noqa
-from starlette.responses import Response
+from starlette.responses import Response  # noqa
 
 from app.api.v1_api import v1_router
 from core.config import get_conf

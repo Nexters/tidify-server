@@ -3,17 +3,17 @@ from sqlalchemy import (
     Integer,
     DateTime,
     func, String,
-    Enum,
+    Enum, ForeignKey,
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 
 from database.conn import db, Base
 
 
 class BaseMixin:
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, nullable=False, default=func.now())
-    updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now(), onupdate=func.now())
 
     def __init__(self):
         self._q = None
@@ -167,15 +167,20 @@ class BaseMixin:
 
 class Bookmarks(Base, BaseMixin):
     __tablename__ = "bookmarks"
-    user_id = Column("user_id", Integer)
     title = Column("title", String(50))
     url = Column("url", String(1000))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    users = relationship("Users")
 
 
 class Users(Base, BaseMixin):
     __tablename__ = "users"
-    status = Column(Enum("active", "deleted", "blocked"), default="active")
+    status = Column(Enum("active", "deleted", "blocked", name="status"), default="active")
     email = Column(String(length=255), nullable=True, unique=True)
     name = Column(String(length=255), nullable=True)
     profile_img = Column(String(length=1000), nullable=True)
-    sns_type = Column(Enum("facebook", "google", "kakao"), nullable=True)
+    sns_type = Column(Enum("facebook", "google", "kakao", name="sns_type"), nullable=True)
+
+
+# alembic env.py에서 table auto search가 안된다면 import 해주어야 한다.
+__all__ = ['Bookmarks', 'Users']

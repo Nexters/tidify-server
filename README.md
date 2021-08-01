@@ -3,8 +3,11 @@
 
 ## dev
 ```bash
+# /tidify-server/src
 $ docker compose -f docker-compose.dev.yml up
-$ python src/main.py
+$ alembic revision --autogenerate -m "<write_here_migration_name>" 
+$ alembic upgrade head
+$ python main.py
 $ docker compose -f docker-compose.dev.yml down --rmi local 
 ```
 
