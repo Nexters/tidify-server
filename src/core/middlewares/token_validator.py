@@ -1,14 +1,13 @@
 import re
 import time
 
-import jwt
 import sqlalchemy.exc
-from jwt import ExpiredSignatureError, DecodeError
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.models.models.users import UserToken
-from core import consts
+from app.services.auth import decode_token
+from app.services.users import get_user_by_access_token
 from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST
 from core.errors import exceptions
 from core.errors.exceptions import SqlFailureException, APIException
@@ -21,7 +20,6 @@ async def access_control(request: Request, call_next):
     request.state.start = time.time()
     request.state.inspect = None
     request.state.user = None
-    request.state.service = None
 
     ip = request.headers["x-forwarded-for"] if "x-forwarded-for" in request.headers.keys() else request.client.host
     request.state.ip = ip.split(",")[0] if "," in ip else ip
@@ -34,21 +32,32 @@ async def access_control(request: Request, call_next):
             await api_logger(request=request, response=response)
         return response
 
-    try:
-        if url.startswith("/api"):
-            access_token = _get_access_token_from_header(headers)
-            if not access_token:
-                raise exceptions.UnAuthorizedException()
-            token_info = await _token_decode(access_token=access_token)
-            request.state.user = UserToken(**token_info)
-        response = await call_next(request)
-        await api_logger(request=request, response=response)
-    except Exception as e:
-        error = await _exception_handler(e)
-        error_dict = dict(status=error.status_code, msg=error.msg, detail=error.detail, code=error.code)
-        response = JSONResponse(status_code=error.status_code, content=error_dict)
-        await api_logger(request=request, error=error)
+    if url.startswith("/api"):
+        access_token = _get_access_token_from_header(headers)
+        if not access_token:
+            raise exceptions.UnAuthorizedException()
+        request.state.user = await get_user_by_access_token(access_token)
+
+    response = await call_next(request)
+    await api_logger(request=request, response=response)
     return response
+
+    # for debug
+    # try:
+    #     if url.startswith("/api"):
+    #         access_token = _get_access_token_from_header(headers)
+    #         if not access_token:
+    #             raise exceptions.UnAuthorizedException()
+    #         token_info = await decode_token(access_token=access_token)
+    #         request.state.user = UserToken(**token_info)
+    #     response = await call_next(request)
+    #     await api_logger(request=request, response=response)
+    # except Exception as e:
+    # error = await _exception_handler(e)
+    # error_dict = dict(status=error.status_code, msg=error.msg, detail=error.detail, code=error.code)
+    # response = JSONResponse(status_code=error.status_code, content=error_dict)
+    # await api_logger(request=request, error=error)
+    # return response
 
 
 def _get_access_token_from_header(headers):
@@ -63,21 +72,6 @@ async def _url_pattern_check(path, pattern):
     if result:
         return True
     return False
-
-
-async def _token_decode(access_token):
-    """
-    :param access_token:
-    :return:
-    """
-    try:
-        access_token = access_token.replace("Bearer ", "")
-        payload = jwt.decode(access_token, key=consts.JWT_SECRET, algorithms=[consts.JWT_ALGORITHM])
-    except ExpiredSignatureError:
-        raise exceptions.TokenExpiredException()
-    except DecodeError:
-        raise exceptions.TokenDecodeException()
-    return payload
 
 
 async def _exception_handler(error: Exception):

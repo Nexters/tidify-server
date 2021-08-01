@@ -1,9 +1,30 @@
-import jwt
 import httpx
+import jwt
+from fastapi.security import APIKeyHeader
+from jwt import ExpiredSignatureError, DecodeError
 
 from app.models.models.kakao import KakaoUserMeResponse
 from app.models.models.users import UserToken
+from core import consts
 from core.consts import JWT_SECRET, JWT_ALGORITHM
+from core.errors import exceptions
+
+AUTH_HEADER = APIKeyHeader(name="Authorization")
+
+
+async def decode_token(access_token):
+    """
+    :param access_token:
+    :return:
+    """
+    try:
+        access_token = access_token.replace("Bearer ", "")
+        payload = jwt.decode(access_token, key=consts.JWT_SECRET, algorithms=[consts.JWT_ALGORITHM])
+    except ExpiredSignatureError:
+        raise exceptions.TokenExpiredException()
+    except DecodeError:
+        raise exceptions.TokenDecodeException()
+    return payload
 
 
 def create_access_token(user_token: UserToken, expires_delta: int = None):  # TODO: exp

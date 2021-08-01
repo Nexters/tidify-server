@@ -4,7 +4,6 @@ from os import environ
 
 import uvicorn
 from fastapi import FastAPI
-from fastapi.security import APIKeyHeader
 from starlette.middleware.base import BaseHTTPMiddleware  # noqa
 from starlette.middleware.cors import CORSMiddleware  # noqa
 from starlette.responses import Response  # noqa
@@ -13,8 +12,6 @@ from app.api.v1_api import v1_router
 from core.config import get_conf
 from core.middlewares.token_validator import access_control
 from database.conn import db
-
-API_KEY_HEADER = APIKeyHeader(name="Authorization", auto_error=False)
 
 
 def create_app(environment):
