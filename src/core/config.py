@@ -1,19 +1,17 @@
 from dataclasses import dataclass
-
-from os import path, environ
+from os import path
 
 from pydantic import PostgresDsn
 
 base_dir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))  # tidify-server
 
 
-# POSTGRES_HOST = os.getenv("POSTGRES_HOST", 'ec2-52-5-1-20.compute-1.amazonaws.com')
-# POSTGRES_NAME = os.getenv("POSTGRES_NAME", 'ddq5ksej7gtep6')
-# POSTGRES_USER = os.getenv("POSTGRES_USER", 'dcvudhthivliek')
-# POSTGRES_PORT = os.getenv("POSTGRES_PORT", '5432')
-# POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD",
-#                               '94b792441ea21663cbe53a3c592971b3d67b4a7dd91e8764fc21726021682dc6')
-# DATABASE_URL = f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_NAME}"
+
+# POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+# POSTGRES_DB = os.getenv("POSTGRES_DB")
+# POSTGRES_USER = os.getenv("POSTGRES_USER")
+# POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+# DATABASE_URL = f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
 
 @dataclass
@@ -23,7 +21,6 @@ class Config:
     DB_ECHO: bool = True  # dev
     DEBUG: bool = False
     TEST_MODE: bool = False
-    # DB_URL: str = environ.get("DB_URL", "mysql+pymysql://tidify:tidify1!@127.0.0.1/tidify?charset=utf8mb4")
     DB_URL: str = PostgresDsn.build(
             scheme="postgresql",
             host="localhost",
@@ -48,7 +45,7 @@ class ProdConfig(Config):
 
 @dataclass
 class TestConfig(Config):
-    DB_URL: str = "mysql+pymysql://travis@localhost/notification_test?charset=utf8mb4" # TODO: test 로컬 환경 생성
+    DB_URL: str = "mysql+pymysql://travis@localhost/notification_test?charset=utf8mb4"  # TODO: test 로컬 환경 생성
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     TEST_MODE: bool = True

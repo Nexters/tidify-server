@@ -18,13 +18,6 @@ $ heroku container:release web
 $ heroku open
 ```
 
-## TODO
-
-- [x] sqlalchemy orm연동
-- [x] List / Create
-- [x] Swagger
-- [x] heroku with docker-compose
-- [ ] postgresql add-on
 
 
 
