@@ -17,4 +17,5 @@ async def get_bookmarks_by_user_id(session: Session, user_id: int):
 
 
 def update_bookmark(session: Session, user_id: int, bookmark_id: int, bookmark_in: BookmarkUpdateRequest):
-    return Bookmarks.update(session=session, auto_commit=True, id=bookmark_id, user_id=user_id, **bookmark_in.dict())
+    return Bookmarks.filter(session=session, id=bookmark_id).update(auto_commit=True, user_id=user_id,
+                                                                    **bookmark_in.dict())

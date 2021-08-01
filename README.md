@@ -1,6 +1,11 @@
 # tidify-server
 > Team Testo bookmark server(tidify)
 
+## dep
+```
+pip install fastapi 'uvicorn[standard]' SQLAlchemy alembic PyJWT psycopg2
+```
+
 ## dev
 ```bash
 # /tidify-server/src

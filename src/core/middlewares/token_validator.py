@@ -3,7 +3,7 @@ import time
 
 import jwt
 import sqlalchemy.exc
-from jwt.exceptions import ExpiredSignatureError, DecodeError
+from jwt import ExpiredSignatureError, DecodeError
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -74,9 +74,9 @@ async def _token_decode(access_token):
         access_token = access_token.replace("Bearer ", "")
         payload = jwt.decode(access_token, key=consts.JWT_SECRET, algorithms=[consts.JWT_ALGORITHM])
     except ExpiredSignatureError:
-        raise exceptions.TokenExpiredEx()
+        raise exceptions.TokenExpiredException()
     except DecodeError:
-        raise exceptions.TokenDecodeEx()
+        raise exceptions.TokenDecodeException()
     return payload
 
 

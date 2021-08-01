@@ -1,5 +1,5 @@
 import jwt
-import requests
+import httpx
 
 from app.models.models.kakao import KakaoUserMeResponse
 from app.models.models.users import UserToken
@@ -59,11 +59,13 @@ async def get_kakao_user_profile(access_token: str) -> KakaoUserMeResponse:
         ),
     }
 
-    res = requests.post("https://kapi.kakao.com/v2/user/me", headers=headers)
+    async with httpx.AsyncClient() as client:
+        res = await client.post("https://kapi.kakao.com/v2/user/me", headers=headers)
+
     try:
         res.raise_for_status()
-    except Exception as e:
-        print(e)
+    except httpx.HTTPStatusError as exc:
+        print(exc)
         # logger.warning(e)
         # raise exceptions.KakaoMeEx
     print(res.json())
