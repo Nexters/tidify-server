@@ -4,7 +4,7 @@ import time
 import sqlalchemy.exc
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-
+import traceback
 from app.models.models.users import UserToken
 from app.services.auth import decode_token
 from app.services.users import get_user_by_access_token
@@ -32,32 +32,21 @@ async def access_control(request: Request, call_next):
             await api_logger(request=request, response=response)
         return response
 
-    if url.startswith("/api"):
-        access_token = _get_access_token_from_header(headers)
-        if not access_token:
-            raise exceptions.UnAuthorizedException()
-        request.state.user = await get_user_by_access_token(access_token)
+    try:
+        if url.startswith("/api"):
+            access_token = _get_access_token_from_header(headers)
+            if not access_token:
+                raise exceptions.UnAuthorizedException()
+            request.state.user = await get_user_by_access_token(access_token)  # TODO: 중복이므로 처리 필요
 
-    response = await call_next(request)
-    await api_logger(request=request, response=response)
+        response = await call_next(request)
+        await api_logger(request=request, response=response)
+    except Exception as e:
+        error = await _exception_handler(e)
+        error_dict = dict(status=error.status_code, msg=error.msg, detail=error.detail, code=error.code)
+        response = JSONResponse(status_code=error.status_code, content=error_dict)
+        await api_logger(request=request, error=error)
     return response
-
-    # for debug
-    # try:
-    #     if url.startswith("/api"):
-    #         access_token = _get_access_token_from_header(headers)
-    #         if not access_token:
-    #             raise exceptions.UnAuthorizedException()
-    #         token_info = await decode_token(access_token=access_token)
-    #         request.state.user = UserToken(**token_info)
-    #     response = await call_next(request)
-    #     await api_logger(request=request, response=response)
-    # except Exception as e:
-    # error = await _exception_handler(e)
-    # error_dict = dict(status=error.status_code, msg=error.msg, detail=error.detail, code=error.code)
-    # response = JSONResponse(status_code=error.status_code, content=error_dict)
-    # await api_logger(request=request, error=error)
-    # return response
 
 
 def _get_access_token_from_header(headers):
@@ -75,7 +64,7 @@ async def _url_pattern_check(path, pattern):
 
 
 async def _exception_handler(error: Exception):
-    print(error)
+    traceback.print_exc()
     if isinstance(error, sqlalchemy.exc.OperationalError):
         error = SqlFailureException(ex=error)
     if not isinstance(error, APIException):
