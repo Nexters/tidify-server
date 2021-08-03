@@ -17,9 +17,12 @@ $ docker compose -f docker-compose.dev.yml down --rmi local
 ```
 
 ## sandbox setup
-
 ```
 $ heroku git:remote -a tidify
+```
+
+```
+$ docker build -t web .
 $ heroku container:login
 $ heroku container:push web
 $ heroku container:release web

@@ -19,7 +19,7 @@ class SQLAlchemy:
         :param kwargs:
         :return:
         """
-        database_url = kwargs.get("DB_URL")
+        database_url = kwargs.get("DATABASE_URL")
         pool_recycle = kwargs.setdefault("DB_POOL_RECYCLE", 900)
         echo = kwargs.setdefault("DB_ECHO", True)
 

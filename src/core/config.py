@@ -4,14 +4,17 @@ from dataclasses import dataclass
 from dotenv import load_dotenv  # noqa
 
 _BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tidify-server
-load_dotenv(os.path.join(_BASE_DIR, ".env"))  # TODO: phase 분리, phase별로 env 네이밍 변경
+env = os.environ.get("ENVIRONMENT", "local")
+if env in ('local', 'test',):
+    print(f"YESSSS config.py {env}")
+    load_dotenv(os.path.join(_BASE_DIR, ".env.dev"))
 
 
-# POSTGRES_HOST = os.getenv("POSTGRES_HOST")
-# POSTGRES_DB = os.getenv("POSTGRES_DB")
-# POSTGRES_USER = os.getenv("POSTGRES_USER")
-# POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-# DATABASE_URL = f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+def _get_url():
+    uri = os.getenv("DATABASE_URL", "postgresql+psycopg2://tidify:tidify1!@localhost:5432/tidify_db")
+    if uri.startswith("postgres://"):
+        return uri.replace("postgres://", "postgresql+psycopg2://", 1)
+    return uri
 
 
 @dataclass
@@ -20,11 +23,18 @@ class Config:
     DB_ECHO: bool = True  # dev
     DEBUG: bool = False
     TEST_MODE: bool = False
-    DB_URL: str = os.getenv("DATABASE_URL")
+    DATABASE_URL: str = _get_url()
 
 
 @dataclass
 class LocalConfig(Config):
+    TRUSTED_HOSTS = ["*"]
+    ALLOW_SITE = ["*"]
+    DEBUG: bool = True
+
+
+@dataclass
+class SandboxConfig(Config):
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     DEBUG: bool = True
@@ -38,14 +48,13 @@ class ProdConfig(Config):
 
 @dataclass
 class TestConfig(Config):
-    DB_URL: str = "mysql+pymysql://travis@localhost/notification_test?charset=utf8mb4"  # TODO: test 로컬 환경 생성
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     TEST_MODE: bool = True
 
 
-_config = dict(prod=ProdConfig, local=LocalConfig, test=TestConfig)
+_config = dict(prod=ProdConfig, sandbox=SandboxConfig, local=LocalConfig, test=TestConfig)
 
 
-def get_conf(env):
-    return _config[env]()
+def get_conf(phase):
+    return _config[phase]()

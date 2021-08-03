@@ -1,29 +1,33 @@
-# pull official base image
-FROM python:3.8.6-alpine
+# ------------------------------------------------------------------------------
+# Base image
+# ------------------------------------------------------------------------------
+FROM python:3.8-slim AS base
 
-# set work directory
+# ------------------------------------------------------------------------------
+# Install dependencies
+# ------------------------------------------------------------------------------
+FROM base AS deps
+COPY requirements.txt ./
+
+# ERROR: No matching distribution found for psycopg2==2.9.1
+RUN apt update > /dev/null && \
+        apt install -y build-essential && \
+        pip install --disable-pip-version-check -r requirements.txt
+
+# ------------------------------------------------------------------------------
+# Final image
+# ------------------------------------------------------------------------------
+FROM base
 WORKDIR /usr/src/app
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+COPY ./src /usr/src/app
+COPY requirements.txt /usr/src/app/
 
-# copy requirements file
-COPY ./requirements.txt /usr/src/app/requirements.txt
-
-# install dependencies
-RUN set -eux \
-    && apk add --no-cache --virtual .build-deps build-base \
-        libressl-dev libffi-dev gcc musl-dev python3-dev \
-        postgresql-dev bash \
-    && pip install --upgrade pip setuptools wheel \
-    && pip install -r /usr/src/app/requirements.txt \
-    && rm -rf /root/.cache/pip
-
-# TODO: .dockerignore for .env
-# copy project
-COPY . /usr/src/app/
+COPY --from=deps /root/.cache /root/.cache
+RUN pip install --disable-pip-version-check -r requirements.txt && \
+        rm -rf /root/.cache
 
 # Run the app.  CMD is required to run on Heroku
 # $PORT is set by Heroku
-CMD uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port $PORT
+CMD alembic upgrade head && uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port $PORT
+

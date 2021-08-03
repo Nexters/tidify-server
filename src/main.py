@@ -1,6 +1,6 @@
+import os
 from dataclasses import asdict
 from datetime import datetime
-from os import environ
 
 import uvicorn
 from fastapi import FastAPI
@@ -31,11 +31,9 @@ def create_app(environment):
     return _app
 
 
-env = environ.get("ENVIRONMENT", "local")
+env = os.environ.get("ENVIRONMENT", "local")
+print(f"YESSSS main.py {env}")
 app = create_app(env)
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
 
 
 @app.get("/")
@@ -45,3 +43,7 @@ async def index():
     """
     current_time = datetime.utcnow()
     return Response(f"Tidify Server (UTC: {current_time.strftime('%Y.%m.%d %H:%M:%S')})")
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)

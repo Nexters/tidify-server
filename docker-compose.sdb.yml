@@ -1,25 +1,13 @@
 version: '3.8'
 
 services:
-  web:
-    build: ./
-    command: |
-      bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000'
-    volumes:
-      - ./:/usr/src/app/
+  app:
+    container_name: app
+    image: web:latest
+    command: bash -c "alembic upgrade head && uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8080"
     ports:
-      - 8002:8000
+      - 8080:8080
     environment:
-      - DATABASE_URL=postgresql://tidify:tidify1!@db/tidify_sdb
-  db:
-    image: postgres:13-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=tidify
-      - POSTGRES_PASSWORD=tidify1!
-      - POSTGRES_DB=tidify_sdb
-volumes:
-  postgres_data:
+      - ENVIRONMENT=sandbox
+      - DATABASE_URL=postgres://prtprymxsmgtqh:515cee1fe82e02ad203f5dfb466876c7f0aa171dd4e33b0030dbdd8886f242cb@ec2-3-226-59-11.compute-1.amazonaws.com:5432/d6efav76o88va2
+    restart: always

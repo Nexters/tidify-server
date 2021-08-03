@@ -10,7 +10,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # tidify
 sys.path.append(BASE_DIR)
 
 ENV_DIR = os.path.dirname(BASE_DIR)
-load_dotenv(os.path.join(ENV_DIR, ".env.dev"))
+
+env = os.environ.get("ENVIRONMENT", "local")
+if env in ('local', 'test',):
+    print(f"YESSSS env.py {env}")
+    load_dotenv(os.path.join(ENV_DIR, ".env.dev"))
 
 config = context.config
 fileConfig(config.config_file_name)
@@ -22,8 +26,10 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    # return "postgresql+psycopg2://tidify:tidify1!@localhost:5432/tidify_db"
-    return os.getenv("DATABASE_URL")
+    uri = os.getenv("DATABASE_URL")
+    if uri.startswith("postgres://"):
+        return uri.replace("postgres://", "postgresql+psycopg2://", 1)
+    return uri
 
 
 def run_migrations_offline():

@@ -24,18 +24,6 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
     ports:
-      - "5555:80"
+      - 5555:80
     depends_on:
       - db
-
-  app:
-    container_name: app
-    build: .
-    command: bash -c "alembic upgrade head && python src/main.py"
-    volumes:
-      - .:/usr/src/app
-    ports:
-      - 8000:8000
-    depends_on:
-      - db
-    restart: always
