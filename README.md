@@ -1,25 +1,34 @@
 # tidify-server
 > Team Testo bookmark server(tidify)
 
+## dep
+```
+pip install fastapi 'uvicorn[standard]' SQLAlchemy alembic PyJWT psycopg2
+```
 
-## setup
-`uvicorn app.main:app --reload --log-level=debug`
+## dev
+```bash
+# /tidify-server/src
+$ docker compose -f docker-compose.dev.yml up
+$ alembic revision --autogenerate -m "<write_here_migration_name>" 
+$ alembic upgrade head
+$ python main.py
+$ docker compose -f docker-compose.dev.yml down --rmi local 
+```
 
+## sandbox setup
 ```
 $ heroku git:remote -a tidify
+```
+
+```
+$ docker build -t web .
 $ heroku container:login
 $ heroku container:push web
 $ heroku container:release web
 $ heroku open
 ```
 
-## TODO
-
-- [x] sqlalchemy orm연동
-- [x] List / Create
-- [x] Swagger
-- [x] heroku with docker-compose
-- [ ] postgresql add-on
 
 
 
