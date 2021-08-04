@@ -1,6 +1,3 @@
-"""
-routes/health.py 테스트
-"""
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.orm import Session

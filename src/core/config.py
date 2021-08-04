@@ -50,7 +50,7 @@ class ProdConfig(Config):
 class TestConfig(Config):
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
-    TEST_MODE: bool = True
+    TEST_MODE: bool = False
     DATABASE_URL: str = "sqlite:///./test.db"
 
 
