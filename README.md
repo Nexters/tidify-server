@@ -3,7 +3,7 @@
 
 ## dep
 ```
-pip install fastapi 'uvicorn[standard]' SQLAlchemy alembic PyJWT psycopg2
+pip install fastapi 'uvicorn[standard]' SQLAlchemy alembic PyJWT psycopg2-binary pytest-asyncio
 ```
 
 ## dev

@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from dotenv import load_dotenv  # noqa
 
 _BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tidify-server
-env = os.environ.get("ENVIRONMENT", "local")
-if env in ('local', 'test',):
-    print(f"YESSSS config.py {env}")
+_env = os.environ.get("ENVIRONMENT", "local")
+
+if _env == 'local':
     load_dotenv(os.path.join(_BASE_DIR, ".env.dev"))
 
 
@@ -51,6 +51,7 @@ class TestConfig(Config):
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     TEST_MODE: bool = True
+    DATABASE_URL: str = "sqlite:///./test.db"
 
 
 _config = dict(prod=ProdConfig, sandbox=SandboxConfig, local=LocalConfig, test=TestConfig)
