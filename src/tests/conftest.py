@@ -1,8 +1,9 @@
 import os
+from asyncio import get_event_loop
 from typing import Generator, List
 
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from sqlalchemy.orm import Session
 
 from database.conn import Base, db
@@ -16,10 +17,16 @@ def app():
 
 
 @pytest.fixture(scope="module")
-def client(app) -> Generator:
+async def async_client(app) -> Generator:
     Base.metadata.create_all(db.engine)
-    with TestClient(app=app) as c:
-        yield c
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
+
+
+@pytest.fixture(scope="module")
+def event_loop():
+    loop = get_event_loop()
+    yield loop
 
 
 @pytest.fixture(scope="function", autouse=True)
