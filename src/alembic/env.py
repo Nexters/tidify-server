@@ -6,13 +6,15 @@ from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
+from core.consts import Phase
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # tidify-server/src
 sys.path.append(BASE_DIR)
 
 ENV_DIR = os.path.dirname(BASE_DIR)
 
-_env = os.environ.get("ENVIRONMENT", "local")
-if _env == 'local':
+_env = os.environ.get("ENVIRONMENT", Phase.local)
+if _env == Phase.local:
     load_dotenv(os.path.join(ENV_DIR, ".env.dev"))
 
 config = context.config

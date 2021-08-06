@@ -6,6 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import logging
 
+from core.consts import Phase
+
 
 class SQLAlchemy:
     def __init__(self, app: FastAPI = None, **kwargs):
@@ -21,18 +23,16 @@ class SQLAlchemy:
         :param kwargs:
         :return:
         """
+        environment = kwargs.get("ENVIRONMENT", Phase.local)
         database_url = kwargs.get("DATABASE_URL")
-        pool_recycle = kwargs.setdefault("DB_POOL_RECYCLE", 900)
-        echo = kwargs.setdefault("DB_ECHO", True)
+        engine_kwargs = {
+            'echo': kwargs.setdefault("DB_ECHO", True),
+            'pool_recycle': kwargs.setdefault("DB_POOL_RECYCLE", 900),
+            'pool_pre_ping': True,
+            **({'connect_args': {"check_same_thread": False}} if environment == Phase.test else {})
+        }
 
-        self._engine = create_engine(
-                database_url,
-                echo=echo,
-                pool_recycle=pool_recycle,
-                pool_pre_ping=True,
-                # connect_args={"check_same_thread": False}  # TODO: postgresql 성능 문제 없는 지 확인
-        )
-
+        self._engine = create_engine(url=database_url, **engine_kwargs)
         self._session = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
 
         # Base.metadata.create_all(bind=self._engine)
