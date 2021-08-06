@@ -1,6 +1,8 @@
 # tidify-server
 > Team Testo bookmark server(tidify)
 
+[![Deploy](https://github.com/Nexters/tidify-server/actions/workflows/main.yml/badge.svg)](https://github.com/Nexters/tidify-server/actions/workflows/main.yml)
+
 ## dep
 ```
 pip install fastapi 'uvicorn[standard]' SQLAlchemy alembic PyJWT psycopg2-binary pytest-asyncio

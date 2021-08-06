@@ -37,6 +37,6 @@ jobs:
           usedocker: true
           healthcheck: "http://tidify.herokuapp.com"
           rollbackonhealthcheckfailed: true
-          procfile: "alembic upgrade head && uvicorn main:app --reload --workers 1 --host=0.0.0.0 --port=${PORT:-5000}"
+          delay: 5
         env:
-          ENVIRONMENT: sandbox
+          ENVIRONMENT: sandbox # TODO: update phase
