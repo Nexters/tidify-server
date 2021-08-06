@@ -3,8 +3,10 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv  # noqa
 
+from core.consts import Phase
+
 _BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tidify-server
-_env = os.environ.get("ENVIRONMENT", "local")
+_env = os.environ.get("ENVIRONMENT", Phase.local)
 
 if _env == 'local':
     load_dotenv(os.path.join(_BASE_DIR, ".env.dev"))
@@ -28,6 +30,7 @@ class Config:
 
 @dataclass
 class LocalConfig(Config):
+    ENVIRONMENT: Phase = Phase.local
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     DEBUG: bool = True
@@ -35,6 +38,7 @@ class LocalConfig(Config):
 
 @dataclass
 class SandboxConfig(Config):
+    ENVIRONMENT: Phase = Phase.sandbox
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     DEBUG: bool = True
@@ -42,12 +46,14 @@ class SandboxConfig(Config):
 
 @dataclass
 class ProdConfig(Config):
+    ENVIRONMENT: Phase = Phase.production
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
 
 
 @dataclass
 class TestConfig(Config):
+    ENVIRONMENT: Phase = Phase.test
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     TEST_MODE: bool = False

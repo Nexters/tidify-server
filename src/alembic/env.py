@@ -11,10 +11,12 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from core.consts import Phase
+
 from database.conn import Base
 from database.schema import *  # noqa
 
 ENV_DIR = os.path.dirname(BASE_DIR)
+
 _env = os.environ.get("ENVIRONMENT", Phase.local)
 if _env == Phase.local:
     load_dotenv(os.path.join(ENV_DIR, ".env.dev"))

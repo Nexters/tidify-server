@@ -16,12 +16,8 @@ async def test_create_bookmark(async_client: AsyncClient, session: Session, acce
                                        json=bookmark_create_request.dict())
 
     assert response.status_code == status.HTTP_201_CREATED
-
     content = response.json()
     assert "id" in content
     assert "user_id" in content
     assert content["title"] == bookmark_create_request.title
     assert content["url"] == bookmark_create_request.url
-
-
-
