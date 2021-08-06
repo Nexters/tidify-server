@@ -29,5 +29,5 @@ RUN pip install --disable-pip-version-check -r requirements.txt && \
 
 # Run the app.  CMD is required to run on Heroku
 # $PORT is set by Heroku
-CMD alembic upgrade head && uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port $PORT
+# CMD alembic upgrade head && uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port $PORT
 
