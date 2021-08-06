@@ -29,7 +29,14 @@ $ heroku container:release web
 $ heroku open
 ```
 
+## heroku ping
+> heroku free는 30분동안 트래픽이 없으면 idle로 들어간다. 이를 방지 하기 위한 cron job (16h max per day)
 
+- [Kaffeine](https://kaffeine.herokuapp.com/)
+- Heroku requires all free applications to sleep for 6 hours every day.
+
+## refs
+- [Heroku tips](https://towardsdatascience.com/how-to-deploy-your-fastapi-app-on-heroku-for-free-8d4271a4ab9)
 
 
 
