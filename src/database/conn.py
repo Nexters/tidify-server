@@ -30,7 +30,7 @@ class SQLAlchemy:
                 echo=echo,
                 pool_recycle=pool_recycle,
                 pool_pre_ping=True,
-                connect_args={"check_same_thread": False}  # TODO: postgresql 성능 문제 없는 지 확인
+                # connect_args={"check_same_thread": False}  # TODO: postgresql 성능 문제 없는 지 확인
         )
 
         self._session = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
