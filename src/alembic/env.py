@@ -11,9 +11,8 @@ sys.path.append(BASE_DIR)
 
 ENV_DIR = os.path.dirname(BASE_DIR)
 
-env = os.environ.get("ENVIRONMENT", "local")
-if env in ('local', 'test',):
-    print(f"YESSSS env.py {env}")
+_env = os.environ.get("ENVIRONMENT", "local")
+if _env == 'local':
     load_dotenv(os.path.join(ENV_DIR, ".env.dev"))
 
 config = context.config

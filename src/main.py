@@ -14,9 +14,18 @@ from core.middlewares.token_validator import access_control
 from database.conn import db
 
 
-def create_app(environment):
-    _app = FastAPI(title="tidify")
-    conf = get_conf(environment)
+def create_app(phase, title="tidify"):
+    _app = FastAPI(title=title)
+
+    @_app.get("/")
+    async def index():
+        """
+        index API
+        """
+        current_time = datetime.utcnow()
+        return Response(f"Tidify Server (UTC: {current_time.strftime('%Y.%m.%d %H:%M:%S')})")
+
+    conf = get_conf(phase)
     db.init_app(_app, **asdict(conf))
     _app.add_middleware(middleware_class=BaseHTTPMiddleware, dispatch=access_control)
     _app.add_middleware(
@@ -32,18 +41,7 @@ def create_app(environment):
 
 
 env = os.environ.get("ENVIRONMENT", "local")
-print(f"YESSSS main.py {env}")
 app = create_app(env)
-
-
-@app.get("/")
-async def index():
-    """
-    health check API
-    """
-    current_time = datetime.utcnow()
-    return Response(f"Tidify Server (UTC: {current_time.strftime('%Y.%m.%d %H:%M:%S')})")
-
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
