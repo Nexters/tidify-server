@@ -10,6 +10,7 @@ from starlette.responses import Response  # noqa
 
 from app.api.v1_api import v1_router
 from core.config import get_conf
+from core.consts import Phase
 from core.middlewares.token_validator import access_control
 from database.conn import db
 
@@ -40,7 +41,7 @@ def create_app(phase, title="tidify"):
     return _app
 
 
-env = os.environ.get("ENVIRONMENT", "local")
+env = os.environ.get("ENVIRONMENT", Phase.local)
 app = create_app(env)
 
 if __name__ == "__main__":

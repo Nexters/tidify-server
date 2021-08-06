@@ -10,14 +10,15 @@ from sqlalchemy.orm import Session
 from app.crud import user_crud
 from app.models.models.users import UserInput, UserToken
 from app.services.auth import create_access_token
+from core.consts import Phase
 from database.conn import Base, db
 from main import create_app
 
 
 @pytest.fixture(scope="module")
 def app():
-    os.environ["ENVIRONMENT"] = "test"
-    return create_app(phase="test", title="테스트")
+    os.environ["ENVIRONMENT"] = Phase.test
+    return create_app(phase=Phase.test, title="테스트")
 
 
 @pytest.fixture(scope="module")
