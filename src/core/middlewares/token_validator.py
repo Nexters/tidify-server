@@ -34,7 +34,6 @@ async def access_control(request: Request, call_next):
 
     try:
         if url.startswith("/api"):
-            logger.info(f'http headers:{headers}')
             access_token = _get_access_token_from_header(headers)
             logger.info(f'access_token:{access_token}')
             if not access_token:
@@ -51,8 +50,8 @@ async def access_control(request: Request, call_next):
         await api_logger(request=request, error=error)
     return response
 
-
 def _get_access_token_from_header(headers):
+    logger.info(headers)
     auth_code = headers.get("Authorization")
     if not auth_code:
         auth_code = headers.get("authorization")

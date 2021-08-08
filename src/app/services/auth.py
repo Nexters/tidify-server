@@ -10,7 +10,7 @@ from core import consts
 from core.consts import JWT_SECRET, JWT_ALGORITHM
 from core.errors import exceptions
 
-AUTH_HEADER = APIKeyHeader(name="Authorization")
+AUTH_HEADER = APIKeyHeader(name="authorization")
 
 
 async def decode_token(access_token):
