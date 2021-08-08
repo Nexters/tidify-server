@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import user_crud
 from app.models.models.users import UserInput, UserToken, UserMe
-from app.services.auth import decode_token, AUTH_HEADER
+from app.services.auth_svc import decode_token, AUTH_HEADER
 from core.errors.exceptions import UserNotFoundException
 from core.utils.query_utils import to_dict
 from database.conn import db

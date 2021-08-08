@@ -6,8 +6,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 import traceback
 from app.models.models.users import UserToken
-from app.services.auth import decode_token
-from app.services.users import get_user_by_access_token
+from app.services.auth_svc import decode_token
+from app.services.user_svc import get_user_by_access_token
 from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST
 from core.errors import exceptions
 from core.errors.exceptions import SqlFailureException, APIException

@@ -7,7 +7,7 @@ from app.models.models.bookmarks import BookmarkListResponse, BookmarkResponse, 
     BookmarkUpdateRequest
 from app.crud import bookmark_crud
 from app.models.models.users import UserMe
-from app.services.users import get_current_user
+from app.services.user_svc import get_current_user
 
 from core.errors import exceptions
 from core.utils.query_utils import to_dict

@@ -1,5 +1,3 @@
-from enum import IntEnum
-
 from sqlalchemy import (
     Column,
     Integer,
@@ -11,14 +9,8 @@ from sqlalchemy.orm import Session, relationship
 from sqlalchemy_utils import ColorType
 
 from app.models.models.users import SnsType
+from core.consts import MaxLength
 from database.conn import db, Base
-
-
-class MaxLength:
-    base = 255
-    email = 255
-    url = 1000
-    title = 50
 
 
 class BaseMixin:

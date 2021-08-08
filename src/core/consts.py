@@ -12,3 +12,10 @@ class Phase(str, Enum):
     local: str = "local"
     sandbox: str = "sandbox"
     production: str = "production"
+
+
+class MaxLength:
+    base = 255
+    email = 255
+    url = 1000
+    title = 50

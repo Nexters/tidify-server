@@ -15,7 +15,6 @@ colour = None
 try:
     import colour  # noqa
 
-    print("here")
     python_colour_type = colour.Color
 except ImportError:
     python_colour_type = None

@@ -1,11 +1,13 @@
 from sqlalchemy.orm import Session
 
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
+from app.services import bookmark_svc
 from database.schema import Bookmarks
 
 
 async def create_bookmark(session: Session, user_id, bookmark_in: BookmarkCreateRequest):
-    return Bookmarks.create(session=session, auto_commit=True, user_id=user_id, **bookmark_in.dict())
+    filled_bookmark_data = await bookmark_svc.get_filled_bookmark_data(bookmark_in)  # title, og, fav
+    return Bookmarks.create(session=session, auto_commit=True, user_id=user_id, **filled_bookmark_data)
 
 
 async def get_bookmark_by_id(session: Session, bookmark_id: int):

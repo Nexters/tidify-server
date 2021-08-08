@@ -5,8 +5,8 @@ from starlette.responses import JSONResponse  # noqa
 
 from app.crud import user_crud
 from app.models.models.users import Token, SnsType, CreateTokenRequest, UserInput, UserToken
-from app.services.auth import create_access_token, get_kakao_user_profile
-from app.services.users import sign_up_if_not_signed
+from app.services.auth_svc import create_access_token, get_kakao_user_profile
+from app.services.user_svc import sign_up_if_not_signed
 from database.conn import db
 
 auth_router = APIRouter(prefix="/auth")
