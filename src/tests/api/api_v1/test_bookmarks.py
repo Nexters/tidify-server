@@ -44,3 +44,34 @@ async def test_create_bookmark_dup_fail(async_client: AsyncClient, session: Sess
                                            json=bookmark_create_request.dict())
 
     assert dup_response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@pytest.mark.asyncio
+async def test_create_bookmark_with_invalid_url_fail(async_client: AsyncClient, session: Session, access_token:
+typing.Dict) -> None:
+    invalid_url = "ht://naver.com"
+    response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",
+                                       headers=access_token,
+                                       json={
+                                           "title": "네이버",
+                                           "url": invalid_url
+                                       })
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    invalid_url2 = "naver.com"
+    response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",
+                                       headers=access_token,
+                                       json={
+                                           "title": "네이버",
+                                           "url": invalid_url2
+                                       })
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    invalid_url3 = "http://naver"
+    response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",
+                                       headers=access_token,
+                                       json={
+                                           "title": "네이버",
+                                           "url": invalid_url3
+                                       })
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

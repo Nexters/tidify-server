@@ -180,7 +180,7 @@ class Bookmarks(Base, BaseMixin):
         UniqueConstraint('user_id', 'url', ),
     )
 
-    title = Column("title", String(MaxLength.title))  # TODO: default 값으로 url의 title 가져오기
+    title = Column("title", String(MaxLength.title))
     url = Column("url", String(MaxLength.url), unique=True)
     favicon_url = Column("favicon_url", String(MaxLength.url), nullable=True)
     og_url = Column("og_url", String(MaxLength.url), nullable=True)
