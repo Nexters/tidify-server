@@ -21,9 +21,11 @@ async def decode_token(access_token):
     try:
         access_token = access_token.replace("Bearer ", "")
         payload = jwt.decode(access_token, key=consts.JWT_SECRET, algorithms=[consts.JWT_ALGORITHM])
-    except ExpiredSignatureError:
+    except ExpiredSignatureError as err:
+        logger.info(err)
         raise exceptions.TokenExpiredException()
-    except DecodeError:
+    except DecodeError as err:
+        logger.info(err)
         raise exceptions.TokenDecodeException()
     return payload
 
