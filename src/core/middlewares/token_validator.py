@@ -8,7 +8,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.services.users import get_user_by_access_token
-from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST
+from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST, JWT_HEADER_NAME
 from core.errors import exceptions
 from core.errors.exceptions import SqlFailureException, APIException
 from core.utils.date_utils import D
@@ -52,9 +52,9 @@ async def access_control(request: Request, call_next):
 
 def _get_access_token_from_header(headers):
     logger.info(headers)
-    auth_code = headers.get("Authorization")
+    auth_code = headers.get(JWT_HEADER_NAME)
     if not auth_code:
-        auth_code = headers.get("authorization")
+        auth_code = headers.get("tidify_auth")
     return auth_code
 
 

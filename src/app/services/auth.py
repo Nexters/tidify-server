@@ -7,10 +7,10 @@ from jwt import ExpiredSignatureError, DecodeError
 from app.models.models.kakao import KakaoUserMeResponse
 from app.models.models.users import UserToken
 from core import consts
-from core.consts import JWT_SECRET, JWT_ALGORITHM
+from core.consts import JWT_SECRET, JWT_ALGORITHM, JWT_HEADER_NAME
 from core.errors import exceptions
 
-AUTH_HEADER = APIKeyHeader(name="authorization")
+AUTH_HEADER = APIKeyHeader(name=JWT_HEADER_NAME)
 
 
 async def decode_token(access_token):
