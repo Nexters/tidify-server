@@ -3,7 +3,7 @@ from sqlalchemy import (
     Integer,
     DateTime,
     func, String,
-    Enum, ForeignKey, Table,
+    Enum, ForeignKey, Table, UniqueConstraint,
 )
 from sqlalchemy.orm import Session, relationship
 from sqlalchemy_utils import ColorType
@@ -176,6 +176,9 @@ bookmark_tag_table = Table('bookmark_tag', Base.metadata,
 
 class Bookmarks(Base, BaseMixin):
     __tablename__ = "bookmarks"
+    __table_args__ = (
+        UniqueConstraint('user_id', 'url', ),
+    )
 
     title = Column("title", String(MaxLength.title))  # TODO: default 값으로 url의 title 가져오기
     url = Column("url", String(MaxLength.url), unique=True)

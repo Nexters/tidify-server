@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
 from app.services import bookmark_svc
-from core.utils.query_utils import to_dict
 from database.schema import Bookmarks
 
 
