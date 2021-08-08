@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-import re
 import urllib.error
 import urllib.request
 from urllib.parse import urlparse
@@ -8,23 +7,12 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 
-def get_extra_data(url):
-    domain = _get_domain(url)
-    soup = _get_page(url)
-
-    return {
-        'title': _get_og_title(soup),
-        'og_url': _get_og_image_url(soup),
-        'favicon_url': _get_favicon(soup, domain)
-    }
-
-
-def _get_domain(url):
+def get_domain(url):
     parsed_uri = urlparse(url=url)
     return f'{parsed_uri.scheme}://{parsed_uri.netloc}/'
 
 
-def _get_page(url):
+def get_page(url):
     """Scrapes a URL and returns the HTML source.
 
     Args:
@@ -39,17 +27,17 @@ def _get_page(url):
                          from_encoding=response.info().get_param('charset'))
 
 
-def _get_og_title(soup):
+def get_og_title(soup):
     og_titles = soup.findAll("meta", property="og:title")
     return og_titles[0]["content"] if og_titles else None
 
 
-def _get_og_image_url(soup):
+def get_og_image_url(soup):
     og_urls = soup.findAll("meta", property="og:image")
     return og_urls[0]["content"] if og_urls else None
 
 
-def _get_favicon(soup, domain):
+def get_favicon(soup, domain):
     fallback_url = domain + '/favicon.ico'
 
     icon_link = soup.find("link", rel="shortcut icon")

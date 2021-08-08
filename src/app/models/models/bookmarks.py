@@ -20,9 +20,14 @@ class BookmarkResponse(Bookmark):
 
 
 class BookmarkCreateRequest(BaseModel):
-    title: str = Field(min_length=1, max_length=MaxLength.title)
+    title: Optional[str] = Field(min_length=1, max_length=MaxLength.title)
     url: str = Field(min_length=1, max_length=MaxLength.url)  # TODO: regex url
 
+class BookmarkWithMeta(BaseModel):
+    url: str = Field(min_length=1, max_length=MaxLength.url)  # TODO: regex url
+    title: str = Field(min_length=1, max_length=MaxLength.title)
+    favicon_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
+    og_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
 
 class BookmarkUpdateRequest(BaseModel):
     title: Optional[str]
