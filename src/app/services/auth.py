@@ -1,5 +1,6 @@
 import httpx
 import jwt
+from fastapi.logger import logger
 from fastapi.security import APIKeyHeader
 from jwt import ExpiredSignatureError, DecodeError
 
@@ -89,5 +90,6 @@ async def get_kakao_user_profile(access_token: str) -> KakaoUserMeResponse:
         print(exc)
         # logger.warning(e)
         # raise exceptions.KakaoMeEx
-    print(res.json())
+    logger.info(f'[auth kakao]:{res}')
+    logger.info(f'[auth kakao json]:{res.json()}')
     return KakaoUserMeResponse(**res.json())
