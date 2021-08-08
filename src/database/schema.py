@@ -1,13 +1,24 @@
+from enum import IntEnum
+
 from sqlalchemy import (
     Column,
     Integer,
     DateTime,
     func, String,
-    Enum, ForeignKey,
+    Enum, ForeignKey, Table,
 )
 from sqlalchemy.orm import Session, relationship
+from sqlalchemy_utils import ColorType
 
+from app.models.models.users import SnsType
 from database.conn import db, Base
+
+
+class MaxLength:
+    base = 255
+    email = 255
+    url = 1000
+    title = 50
 
 
 class BaseMixin:
@@ -165,22 +176,56 @@ class BaseMixin:
             self._session.flush()
 
 
+bookmark_tag_table = Table('bookmark_tag', Base.metadata,
+                           Column('bookmark_id', ForeignKey('bookmarks.id'), primary_key=True),
+                           Column('tag_id', ForeignKey('tags.id'), primary_key=True)
+                           )
+
+
 class Bookmarks(Base, BaseMixin):
     __tablename__ = "bookmarks"
-    title = Column("title", String(50))
-    url = Column("url", String(1000))
+
+    title = Column("title", String(MaxLength.title))  # TODO: default 값으로 url의 title 가져오기
+    url = Column("url", String(MaxLength.url), unique=True)
+    favicon_url = Column("favicon_url", String(MaxLength.url), nullable=True)
+    og_url = Column("og_url", String(MaxLength.url), nullable=True)
+
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    users = relationship("Users")
+    # TODO: primaryjoin="Bookmarks.user_id==Users.id"
+    users = relationship("Users", back_populates="bookmarks")
+    # TODO: null 가능, uselist=True)
+    tags = relationship(
+            "Tags",
+            secondary=bookmark_tag_table,
+            back_populates="bookmarks")
 
 
+# TODO: primary tag 관리
+class Tags(Base, BaseMixin):
+    __tablename__ = "tags"
+
+    title = Column("title", String(MaxLength.title))
+    # https://github.com/kvesteri/sqlalchemy-utils/blob/master/sqlalchemy_utils/types/color.py
+    color = Column(ColorType)
+
+    bookmarks = relationship(
+            "Bookmarks",
+            secondary=bookmark_tag_table,
+            back_populates="tags")
+
+
+# TODO: ondelete="CASCADE", onupdate="CASCADE"
 class Users(Base, BaseMixin):
     __tablename__ = "users"
+
     status = Column(Enum("active", "deleted", "blocked", name="status"), default="active")
-    email = Column(String(length=255), nullable=True, unique=True)
-    name = Column(String(length=255), nullable=True)
-    profile_img = Column(String(length=1000), nullable=True)
-    sns_type = Column(Enum("facebook", "google", "kakao", name="sns_type"), nullable=True)
+    email = Column(String(length=MaxLength.email), nullable=True, unique=True)
+    name = Column(String(length=MaxLength.base), nullable=True)
+    profile_img = Column(String(length=MaxLength.url), nullable=True)
+    sns_type = Column(Enum("facebook", "google", "kakao", name="sns_type"), nullable=True, default=SnsType.kakao)
+
+    bookmarks = relationship("Bookmarks", back_populates="users")
 
 
 # alembic env.py에서 table auto search가 안된다면 import 해주어야 한다.
-__all__ = ['Bookmarks', 'Users']
+__all__ = ['Bookmarks', 'Tags', 'Users']
