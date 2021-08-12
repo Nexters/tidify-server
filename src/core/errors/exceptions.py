@@ -43,11 +43,11 @@ class UserNotFoundException(APIException):
 
 
 class TokenExpiredException(APIException):
-    def __init__(self, ex: Exception = None):
+    def __init__(self, detail="Token Expired", ex: Exception = None):
         super().__init__(
                 status_code=StatusCode.HTTP_400,
                 msg=f"세션이 만료되어 로그아웃 되었습니다.",
-                detail="Token Expired",
+                detail=detail,
                 code=f"{StatusCode.HTTP_400}{'2'.zfill(4)}",
                 ex=ex,
         )

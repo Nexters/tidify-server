@@ -1,15 +1,16 @@
 import httpx
 import jwt
+from fastapi.logger import logger
 from fastapi.security import APIKeyHeader
 from jwt import ExpiredSignatureError, DecodeError
 
 from app.models.models.kakao import KakaoUserMeResponse
 from app.models.models.users import UserToken
 from core import consts
-from core.consts import JWT_SECRET, JWT_ALGORITHM
+from core.consts import JWT_SECRET, JWT_ALGORITHM, JWT_HEADER_NAME
 from core.errors import exceptions
 
-AUTH_HEADER = APIKeyHeader(name="Authorization")
+AUTH_HEADER = APIKeyHeader(name=JWT_HEADER_NAME)
 
 
 async def decode_token(access_token):
@@ -20,9 +21,11 @@ async def decode_token(access_token):
     try:
         access_token = access_token.replace("Bearer ", "")
         payload = jwt.decode(access_token, key=consts.JWT_SECRET, algorithms=[consts.JWT_ALGORITHM])
-    except ExpiredSignatureError:
+    except ExpiredSignatureError as err:
+        logger.info(err)
         raise exceptions.TokenExpiredException()
-    except DecodeError:
+    except DecodeError as err:
+        logger.info(err)
         raise exceptions.TokenDecodeException()
     return payload
 
@@ -85,9 +88,9 @@ async def get_kakao_user_profile(access_token: str) -> KakaoUserMeResponse:
 
     try:
         res.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        print(exc)
-        # logger.warning(e)
-        # raise exceptions.KakaoMeEx
-    print(res.json())
+    except httpx.HTTPStatusError:
+        logger.info(f'[auth kakao]:{res}')
+        logger.info(f'[auth kakao json]:{res.json()}')
+        raise exceptions.TokenExpiredException(detail=f"kakao login failed access_token: {access_token}")
+
     return KakaoUserMeResponse(**res.json())

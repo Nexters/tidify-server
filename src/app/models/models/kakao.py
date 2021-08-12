@@ -53,7 +53,7 @@ class KakaoUserMeResponse(BaseModel):
         https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
     """
 
-    id: int
+    id: Optional[int]
     properties: Properties
     kakao_account: KakaoAccount
 

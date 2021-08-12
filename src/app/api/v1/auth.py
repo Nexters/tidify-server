@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
+from fastapi.logger import logger
 from sqlalchemy.orm import Session
-
 from starlette.responses import JSONResponse  # noqa
 
 from app.crud import user_crud
@@ -15,6 +15,7 @@ auth_router = APIRouter(prefix="/auth")
 @auth_router.post("", status_code=201, response_model=Token)
 async def get_token(token_request: CreateTokenRequest, session: Session = Depends(db.session)):
     if token_request.sns_type == SnsType.kakao:
+        logger.info(f'get_token: {token_request.access_token}')
         kakao_auth_info = await get_kakao_user_profile(token_request.access_token)  # 정책: 이메일이 없을 경우? 새로 만든다.
         user_input = UserInput(
                 email=kakao_auth_info.kakao_account.email,
