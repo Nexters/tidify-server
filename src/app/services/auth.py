@@ -88,10 +88,9 @@ async def get_kakao_user_profile(access_token: str) -> KakaoUserMeResponse:
 
     try:
         res.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        print(exc)
-        # logger.warning(e)
-        # raise exceptions.KakaoMeEx
-    logger.info(f'[auth kakao]:{res}')
-    logger.info(f'[auth kakao json]:{res.json()}')
+    except httpx.HTTPStatusError:
+        logger.info(f'[auth kakao]:{res}')
+        logger.info(f'[auth kakao json]:{res.json()}')
+        raise exceptions.TokenExpiredException(detail=f"kakao login failed access_token: {access_token}")
+
     return KakaoUserMeResponse(**res.json())
