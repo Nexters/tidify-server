@@ -217,7 +217,7 @@ class Users(Base, BaseMixin):
     email = Column(String(length=MaxLength.email), nullable=True, unique=True)
     name = Column(String(length=MaxLength.base), nullable=True)
     profile_img = Column(String(length=MaxLength.url), nullable=True)
-    sns_type = Column(Enum("facebook", "google", "kakao", name="sns_type"), nullable=True, default=SnsType.kakao)
+    sns_type = Column(Enum("apple", "kakao", "google", name="sns_type"), nullable=True, default=SnsType.kakao)
 
     bookmarks = relationship("Bookmarks", back_populates="users")
 
