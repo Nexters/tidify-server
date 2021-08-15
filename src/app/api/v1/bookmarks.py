@@ -62,6 +62,7 @@ async def delete_bookmark(
         session: Session = Depends(db.session)
 ) -> None:
     bookmark = Bookmarks.filter(session=session, id=bookmark_id, user_id=current_user.id)
+
     if not bookmark.first():
         raise exceptions.BookmarkNotFoundException(bookmark_id=bookmark_id)
     bookmark.delete(auto_commit=True)

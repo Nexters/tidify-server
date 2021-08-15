@@ -3,8 +3,7 @@ from sqlalchemy import (
     Integer,
     DateTime,
     func, String,
-    Enum, ForeignKey, Table, UniqueConstraint,
-)
+    Enum, ForeignKey, Table, UniqueConstraint, )
 from sqlalchemy.orm import Session, relationship
 from sqlalchemy_utils import ColorType
 
@@ -151,7 +150,6 @@ class BaseMixin:
             self._session.commit()
 
     def all(self):
-        print(self.served)
         result = self._q.all()
         self.close()
         return result
@@ -169,8 +167,8 @@ class BaseMixin:
 
 
 bookmark_tag_table = Table('bookmark_tag', Base.metadata,
-                           Column('bookmark_id', ForeignKey('bookmarks.id'), primary_key=True),
-                           Column('tag_id', ForeignKey('tags.id'), primary_key=True)
+                           Column('bookmark_id', ForeignKey('bookmarks.id', ondelete='cascade'), primary_key=True),
+                           Column('tag_id', ForeignKey('tags.id', ondelete='cascade'), primary_key=True)
                            )
 
 
@@ -185,13 +183,13 @@ class Bookmarks(Base, BaseMixin):
     og_img_url = Column("og_img_url", String(MaxLength.url), nullable=True, comment="og 이미지 url")
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    # TODO: primaryjoin="Bookmarks.user_id==Users.id"
+
     users = relationship("Users", back_populates="bookmarks")
-    # TODO: null 가능, uselist=True)
+
     tags = relationship(
             "Tags",
             secondary=bookmark_tag_table,
-            back_populates="bookmarks")
+            backref="bookmarks")
 
 
 # TODO: primary tag 관리
@@ -202,13 +200,7 @@ class Tags(Base, BaseMixin):
     # https://github.com/kvesteri/sqlalchemy-utils/blob/master/sqlalchemy_utils/types/color.py
     color = Column(ColorType)
 
-    bookmarks = relationship(
-            "Bookmarks",
-            secondary=bookmark_tag_table,
-            back_populates="tags")
 
-
-# TODO: ondelete="CASCADE", onupdate="CASCADE"
 class Users(Base, BaseMixin):
     __tablename__ = "users"
 
@@ -218,7 +210,7 @@ class Users(Base, BaseMixin):
     profile_img = Column(String(length=MaxLength.url), nullable=True)
     sns_type = Column(Enum("apple", "kakao", "google", name="sns_type"), nullable=True, default=SnsType.kakao)
 
-    bookmarks = relationship("Bookmarks", back_populates="users")
+    bookmarks = relationship("Bookmarks", back_populates="users", cascade="all, delete-orphan")
 
 
 # alembic env.py에서 table auto search가 안된다면 import 해주어야 한다.
