@@ -69,7 +69,7 @@ async def _url_pattern_check(path, pattern):
 async def _exception_handler(error: Exception):
     logger.info(error)
     traceback.print_exc()
-    if isinstance(error, sqlalchemy.exc.OperationalError):
+    if isinstance(error, sqlalchemy.exc.SQLAlchemyError):
         error = SqlFailureException(ex=error)
     if not isinstance(error, APIException):
         error = APIException(ex=error, detail=str(error))
