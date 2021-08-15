@@ -3,16 +3,16 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, HttpUrl
 
 from app.models.base import OrmModel
+from app.models.models.tags import TagResponse
 from core.consts import MaxLength
 
 
 class Bookmark(OrmModel):
     id: int
-    user_id: int
-    title: str = Field(min_length=1, max_length=MaxLength.title)
     url: HttpUrl
-    favicon_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
-    og_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
+    title: str = Field(min_length=1, max_length=MaxLength.title)
+    og_img_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
+    tags: Optional[List[TagResponse]]
 
 
 class BookmarkResponse(Bookmark):
@@ -20,15 +20,10 @@ class BookmarkResponse(Bookmark):
 
 
 class BookmarkCreateRequest(BaseModel):
+    url: HttpUrl
     title: Optional[str] = Field(min_length=1, max_length=MaxLength.title)
-    url: HttpUrl
-
-
-class BookmarkWithMeta(BaseModel):
-    url: HttpUrl
-    title: str = Field(min_length=1, max_length=MaxLength.title)
-    favicon_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
-    og_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
+    og_img_url: Optional[str]
+    tags: Optional[List[str]]
 
 
 class BookmarkUpdateRequest(BaseModel):

@@ -81,6 +81,7 @@ class BaseMixin:
         cond = []
         for key, val in kwargs.items():
             key = key.split("__")
+            print(key)
             if len(key) > 2:
                 raise Exception("No 2 more dunders")
             col = getattr(cls, key[0])
@@ -130,7 +131,6 @@ class BaseMixin:
 
     def update(self, auto_commit: bool = False, **kwargs):
         qs = self._q.update(kwargs)
-        get_id = self.id
         ret = None
 
         self._session.flush()
@@ -180,12 +180,11 @@ class Bookmarks(Base, BaseMixin):
         UniqueConstraint('user_id', 'url', ),
     )
 
-    title = Column("title", String(MaxLength.title))
     url = Column("url", String(MaxLength.url), unique=True)
-    favicon_url = Column("favicon_url", String(MaxLength.url), nullable=True)
-    og_url = Column("og_url", String(MaxLength.url), nullable=True)
+    title = Column("title", String(MaxLength.title), nullable=True)
+    og_img_url = Column("og_img_url", String(MaxLength.url), nullable=True, comment="og 이미지 url")
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     # TODO: primaryjoin="Bookmarks.user_id==Users.id"
     users = relationship("Users", back_populates="bookmarks")
     # TODO: null 가능, uselist=True)
@@ -199,7 +198,7 @@ class Bookmarks(Base, BaseMixin):
 class Tags(Base, BaseMixin):
     __tablename__ = "tags"
 
-    title = Column("title", String(MaxLength.title))
+    name = Column("name", String(MaxLength.title), unique=True, index=True)
     # https://github.com/kvesteri/sqlalchemy-utils/blob/master/sqlalchemy_utils/types/color.py
     color = Column(ColorType)
 

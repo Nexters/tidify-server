@@ -24,8 +24,8 @@ async def test_create_bookmark(async_client: AsyncClient, session: Session, acce
     assert "user_id" in content
     assert content["title"] == bookmark_create_request.title
     assert content["url"] == bookmark_create_request.url
-    assert content["favicon_url"] is not None
-    assert content["og_url"] is not None
+    assert content["og_img_url"] is not None
+    # tags
 
 
 @pytest.mark.asyncio
