@@ -80,7 +80,6 @@ class BaseMixin:
         cond = []
         for key, val in kwargs.items():
             key = key.split("__")
-            print(key)
             if len(key) > 2:
                 raise Exception("No 2 more dunders")
             col = getattr(cls, key[0])

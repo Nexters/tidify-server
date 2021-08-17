@@ -22,7 +22,7 @@ def _get_url():
 @dataclass
 class Config:
     DB_POOL_RECYCLE: int = 900
-    DB_ECHO: bool = True  # dev
+    DB_ECHO: bool = False  # dev
     DEBUG: bool = False
     TEST_MODE: bool = False
     DATABASE_URL: str = _get_url()
@@ -57,6 +57,7 @@ class TestConfig(Config):
     TRUSTED_HOSTS = ["*"]
     ALLOW_SITE = ["*"]
     TEST_MODE: bool = False
+    DB_ECHO: bool = True
     DATABASE_URL: str = "sqlite:///./test.db"
 
 

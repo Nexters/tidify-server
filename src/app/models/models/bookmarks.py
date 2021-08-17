@@ -23,7 +23,7 @@ class BookmarkCreateRequest(BaseModel):
     url: HttpUrl
     title: Optional[str] = Field(min_length=1, max_length=MaxLength.title)
     og_img_url: Optional[str]
-    tags: Optional[List[str]]
+    tags: Optional[List[str]]  # TODO: tag 이름 -> tag ids
 
 
 class BookmarkUpdateRequest(BaseModel):
