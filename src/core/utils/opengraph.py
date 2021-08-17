@@ -36,7 +36,7 @@ def get_og_image_url(soup):
     og_urls = soup.findAll("meta", property="og:image")
     return og_urls[0]["content"] if og_urls else None
 
-# TODO: url to binary image
+
 def get_favicon(soup, domain):
     fallback_url = domain + '/favicon.ico'
 
