@@ -39,6 +39,14 @@ async def create_bookmark(
 ) -> BookmarkResponse:
     bookmark = await bookmark_crud.create_bookmark(session, current_user.id, bookmark_in)
     return BookmarkResponse(tags=bookmark.tags, **to_dict(bookmark))
+@bookmark_router.get("/{bookmark_id}", response_model=BookmarkDetailResponse, status_code=200)
+async def retrieve_bookmark(
+        current_user: UserMe = Security(get_current_user),
+        bookmark_id: int = __valid_id,
+        session: Session = Depends(db.session)
+) -> BookmarkDetailResponse:
+    bookmark = await bookmark_crud.get_bookmark_by_id(session, current_user.id, bookmark_id)
+    return BookmarkDetailResponse(tags=bookmark.tags, **to_dict(bookmark))
 
 
 @bookmark_router.patch("/{bookmark_id}", response_model=BookmarkResponse, status_code=201)

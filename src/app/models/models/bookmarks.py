@@ -15,7 +15,7 @@ class Bookmark(OrmModel):
     tags: Optional[List[TagResponse]]
 
 
-class BookmarkResponse(Bookmark):
+class BookmarkDetailResponse(Bookmark):
     pass
 
 
@@ -26,11 +26,10 @@ class BookmarkCreateRequest(BaseModel):
     tags: Optional[List[str]]  # TODO: tag 이름 -> tag ids
 
 
-class BookmarkUpdateRequest(BaseModel):
-    title: Optional[str]
+class BookmarkUpdateRequest(BookmarkCreateRequest):
     url: Optional[HttpUrl]
 
 
 class BookmarkListResponse(BaseModel):
-    bookmarks: List[BookmarkResponse]
+    bookmarks: List[BookmarkDetailResponse]
     bookmarks_count: int
