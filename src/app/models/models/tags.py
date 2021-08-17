@@ -12,8 +12,3 @@ class Tag(OrmModel):
 
 class TagResponse(Tag):
     pass
-
-
-class TagCreateDto(BaseModel):
-    name: str = Field(min_length=1, max_length=MaxLength.title)
-    # TODO: Color

@@ -18,4 +18,4 @@ async def get_tags_and_create_tags_if_not_existed(session: Session, tag_names):
     logger.info(f'new_tags: {new_tags}')
     logger.info(f'new_tags: {type(new_tags)}')
 
-    return exist_tags + new_tags
+    return exist_tags, new_tags

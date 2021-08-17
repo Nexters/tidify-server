@@ -9,9 +9,9 @@ from fastapi.logger import logger
 async def create_bookmark(session: Session, user_id, bookmark_in: BookmarkCreateRequest):
     bookmark = Bookmarks.create(session=session, auto_commit=False, user_id=user_id, **bookmark_in.dict())
     if bookmark_in.tags:
-        tags = await tag_svc.get_tags_and_create_tags_if_not_existed(session, bookmark_in.tags)
-        logger.info(tags)
-        bookmark.tags.extend(tags)
+        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_existed(session, bookmark_in.tags)
+        bookmark.tags.extend(exist_tags)
+        bookmark.tags.extend(new_tags)
     session.commit()
     return bookmark
 
