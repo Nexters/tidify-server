@@ -19,8 +19,11 @@ def bookmark_create_request() -> BookmarkCreateRequest:
 
 
 @pytest.mark.asyncio
-async def test_create_bookmark(async_client: AsyncClient, session: Session, access_token: typing.Dict,
-                               bookmark_create_request: BookmarkCreateRequest) -> None:
+async def test_create_bookmark(
+        async_client: AsyncClient, session: Session,
+        access_token: typing.Dict,
+        bookmark_create_request: BookmarkCreateRequest
+) -> None:
     response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",
                                        headers=access_token,
                                        json=bookmark_create_request.dict())
@@ -40,6 +43,29 @@ async def test_create_bookmark(async_client: AsyncClient, session: Session, acce
 
 
 @pytest.mark.asyncio
+async def test_create_bookmark_without_optional_fields(
+        async_client: AsyncClient,
+        session: Session,
+        access_token: typing.Dict,
+        bookmark_create_request: BookmarkCreateRequest
+) -> None:
+    bookmark_create_request.title = None
+    bookmark_create_request.og_img_url = None
+    bookmark_create_request.tags = None
+    response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",
+                                       headers=access_token,
+                                       json=bookmark_create_request.dict())
+
+    assert response.status_code == status.HTTP_201_CREATED
+    content = response.json()
+
+    assert content["id"] is not None
+    assert content["title"] is None
+    assert content["og_img_url"] is None
+    assert content["tags"] == []
+
+
+@pytest.mark.asyncio
 async def test_create_bookmark_dup_fail(async_client: AsyncClient, session: Session, access_token: typing.Dict,
                                         bookmark_create_request: BookmarkCreateRequest
                                         ) -> None:
@@ -56,8 +82,11 @@ async def test_create_bookmark_dup_fail(async_client: AsyncClient, session: Sess
 
 
 @pytest.mark.asyncio
-async def test_create_bookmark_with_invalid_url_fail(async_client: AsyncClient, access_token: typing.Dict,
-                                                     bookmark_create_request: BookmarkCreateRequest) -> None:
+async def test_create_bookmark_with_invalid_url_fail(
+        async_client: AsyncClient,
+        access_token: typing.Dict,
+        bookmark_create_request: BookmarkCreateRequest
+) -> None:
     invalid_url = "ht://naver.com"
     bookmark_create_request.url = invalid_url
     response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",

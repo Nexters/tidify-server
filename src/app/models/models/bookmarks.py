@@ -10,7 +10,7 @@ from core.consts import MaxLength
 class Bookmark(OrmModel):
     id: int
     url: HttpUrl
-    title: str = Field(min_length=1, max_length=MaxLength.title)
+    title: Optional[str] = Field(min_length=1, max_length=MaxLength.title)
     og_img_url: Optional[str] = Field(default=None, min_length=1, max_length=MaxLength.url)
     tags: Optional[List[TagResponse]]
 
