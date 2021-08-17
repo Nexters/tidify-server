@@ -1,13 +1,20 @@
+import psycopg2
+import sqlalchemy
 from sqlalchemy.orm import Session
 
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
 from app.services import tag_svc
+from core.errors.exceptions import BookmarkUrlDuplicateException
 from database.schema import Bookmarks
-from fastapi.logger import logger
 
 
 async def create_bookmark(session: Session, user_id, bookmark_in: BookmarkCreateRequest):
-    bookmark = Bookmarks.create(session=session, auto_commit=False, user_id=user_id, **bookmark_in.dict())
+    try:
+        bookmark = Bookmarks.create(session=session, auto_commit=False, user_id=user_id, **bookmark_in.dict())
+    except sqlalchemy.exc.IntegrityError as err:
+        if isinstance(err.orig, psycopg2.errors.UniqueViolation):
+            raise BookmarkUrlDuplicateException(url=bookmark_in.url)
+
     if bookmark_in.tags:
         exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_existed(session, bookmark_in.tags)
         bookmark.tags.extend(exist_tags)
