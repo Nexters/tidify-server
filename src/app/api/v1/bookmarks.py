@@ -26,10 +26,7 @@ async def list_bookmarks_by_member(
     # TODO: pagination
     bookmarks = await bookmark_crud.get_bookmarks_by_user_id(session, user_id=current_user.id)
     return BookmarkListResponse(
-            bookmarks=[BookmarkResponse(id=bookmark.id,
-                                        user_id=bookmark.user_id,
-                                        title=bookmark.title,
-                                        url=bookmark.url) for bookmark in bookmarks],
+            bookmarks=bookmarks,
             bookmarks_count=len(bookmarks)
     )
 

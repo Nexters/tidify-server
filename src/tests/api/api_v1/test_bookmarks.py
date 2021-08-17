@@ -98,18 +98,13 @@ async def test_create_bookmark_with_invalid_url_fail(
     bookmark_create_request.url = invalid_url2
     response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",
                                        headers=access_token,
-                                       json={
-                                           "title": "네이버",
-                                           "url": bookmark_create_request.dict()
-                                       })
+                                       json=bookmark_create_request.dict())
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     invalid_url3 = "http://naver"
     bookmark_create_request.url = invalid_url3
     response = await async_client.post(f"{API_VERSION_PREFIX}/bookmarks",
                                        headers=access_token,
-                                       json={
-                                           "title": "네이버",
-                                           "url": bookmark_create_request.dict()
-                                       })
+                                       json=bookmark_create_request.dict())
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+

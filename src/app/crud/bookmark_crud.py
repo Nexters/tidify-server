@@ -1,6 +1,6 @@
 import psycopg2
 import sqlalchemy
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
 from app.services import tag_svc
@@ -8,7 +8,7 @@ from core.errors.exceptions import BookmarkUrlDuplicateException
 from database.schema import Bookmarks
 
 
-async def create_bookmark(session: Session, user_id, bookmark_in: BookmarkCreateRequest):
+async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkCreateRequest):
     try:
         bookmark = Bookmarks.create(session=session, auto_commit=False, user_id=user_id, **bookmark_in.dict())
     except sqlalchemy.exc.IntegrityError as err:
@@ -23,12 +23,12 @@ async def create_bookmark(session: Session, user_id, bookmark_in: BookmarkCreate
     return bookmark
 
 
-async def get_bookmark_by_id(session: Session, bookmark_id: int):
-    return Bookmarks.filter(session=session, id=bookmark_id).first()
+async def get_bookmark_by_id(session: Session, user_id: int, bookmark_id: int):
+    return Bookmarks.filter(session=session, id=bookmark_id, user_id=user_id).first()
 
 
-async def get_bookmarks_by_user_id(session: Session, user_id: int):
-    return Bookmarks.filter(session=session, user_id=user_id).all()
+async def get_bookmarks_by_user_id(session: Session, user_id: int) -> Bookmarks:
+    return session.query(Bookmarks).options(selectinload(Bookmarks.tags)).filter(Bookmarks.user_id == user_id).all()
 
 
 def update_bookmark(session: Session, user_id: int, bookmark_id: int, bookmark_in: BookmarkUpdateRequest):
