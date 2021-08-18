@@ -16,8 +16,25 @@ async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkC
             raise BookmarkUrlDuplicateException(url=bookmark_in.url)
 
     if bookmark_in.tags:
-        tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
-        bookmark.tags.extend(tags)
+        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
+        bookmark.tags.extend(exist_tags)
+        bookmark.tags.extend(new_tags)
+    session.commit()
+    return bookmark
+
+
+async def update_bookmark(session: Session, user_id: int, bookmark_id: int, bookmark_in: BookmarkUpdateRequest):
+    bookmark = await get_bookmark_by_id(session, user_id, bookmark_id)
+    bookmark.tags.clear()
+
+    if bookmark_in.tags:
+        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
+        bookmark.tags.extend(exist_tags)
+        bookmark.tags.extend(new_tags)
+
+    bookmark_update_data = bookmark_in.dict(exclude={"tags"}, exclude_unset=True)
+    for key, value in bookmark_update_data.items():
+        setattr(bookmark, key, value)
     session.commit()
     return bookmark
 
@@ -28,8 +45,3 @@ async def get_bookmark_by_id(session: Session, user_id: int, bookmark_id: int):
 
 async def get_bookmarks_by_user_id(session: Session, user_id: int) -> Bookmarks:
     return session.query(Bookmarks).options(selectinload(Bookmarks.tags)).filter(Bookmarks.user_id == user_id).all()
-
-
-def update_bookmark(session: Session, user_id: int, bookmark_id: int, bookmark_in: BookmarkUpdateRequest):
-    return Bookmarks.filter(session=session, id=bookmark_id).update(auto_commit=True, user_id=user_id,
-                                                                    **bookmark_in.dict())

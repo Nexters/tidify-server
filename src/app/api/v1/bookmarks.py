@@ -3,12 +3,12 @@ from fastapi.params import Security
 from sqlalchemy.orm import Session
 from starlette.requests import Request  # noqa
 
-from app.models.models.bookmarks import BookmarkListResponse, BookmarkResponse, BookmarkCreateRequest, \
-    BookmarkUpdateRequest
 from app.crud import bookmark_crud
+from app.models.base import CommandResponse
+from app.models.models.bookmarks import BookmarkListResponse, BookmarkDetailResponse, BookmarkCreateRequest, \
+    BookmarkUpdateRequest
 from app.models.models.users import UserMe
 from app.services.user_svc import get_current_user
-
 from core.errors import exceptions
 from core.utils.query_utils import to_dict
 from database.conn import db
@@ -23,7 +23,7 @@ async def list_bookmarks_by_member(
         current_user: UserMe = Security(get_current_user),
         session: Session = Depends(db.session)
 ) -> BookmarkListResponse:
-    # TODO: pagination
+    # TODO: pagination, ordering
     bookmarks = await bookmark_crud.get_bookmarks_by_user_id(session, user_id=current_user.id)
     return BookmarkListResponse(
             bookmarks=bookmarks,
@@ -31,14 +31,16 @@ async def list_bookmarks_by_member(
     )
 
 
-@bookmark_router.post("/", response_model=BookmarkResponse, status_code=201)
+@bookmark_router.post("/", response_model=BookmarkDetailResponse, status_code=201)
 async def create_bookmark(
         bookmark_in: BookmarkCreateRequest,
         current_user: UserMe = Security(get_current_user),
         session: Session = Depends(db.session)
-) -> BookmarkResponse:
+) -> BookmarkDetailResponse:
     bookmark = await bookmark_crud.create_bookmark(session, current_user.id, bookmark_in)
-    return BookmarkResponse(tags=bookmark.tags, **to_dict(bookmark))
+    return BookmarkDetailResponse(tags=bookmark.tags, **to_dict(bookmark))
+
+
 @bookmark_router.get("/{bookmark_id}", response_model=BookmarkDetailResponse, status_code=200)
 async def retrieve_bookmark(
         current_user: UserMe = Security(get_current_user),
@@ -49,15 +51,15 @@ async def retrieve_bookmark(
     return BookmarkDetailResponse(tags=bookmark.tags, **to_dict(bookmark))
 
 
-@bookmark_router.patch("/{bookmark_id}", response_model=BookmarkResponse, status_code=201)
+@bookmark_router.patch("/{bookmark_id}", response_model=BookmarkDetailResponse, status_code=201)
 async def update_bookmark(
         bookmark_in: BookmarkUpdateRequest,
         current_user: UserMe = Security(get_current_user),
         bookmark_id: int = __valid_id,
         session: Session = Depends(db.session)
-) -> BookmarkResponse:
-    bookmark = bookmark_crud.update_bookmark(session, current_user.id, bookmark_id, bookmark_in)
-    return BookmarkResponse(**to_dict(bookmark))
+) -> BookmarkDetailResponse:
+    bookmark = await bookmark_crud.update_bookmark(session, current_user.id, bookmark_id, bookmark_in)
+    return BookmarkDetailResponse(tags=bookmark.tags, **to_dict(bookmark))
 
 
 @bookmark_router.delete("/{bookmark_id}", status_code=204)
