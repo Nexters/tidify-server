@@ -16,9 +16,8 @@ async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkC
             raise BookmarkUrlDuplicateException(url=bookmark_in.url)
 
     if bookmark_in.tags:
-        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_existed(session, bookmark_in.tags)
-        bookmark.tags.extend(exist_tags)
-        bookmark.tags.extend(new_tags)
+        tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
+        bookmark.tags.extend(tags)
     session.commit()
     return bookmark
 
