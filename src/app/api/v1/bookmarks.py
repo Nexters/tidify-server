@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Path
 from fastapi.params import Security
 from fastapi_pagination import Page, paginate
@@ -22,9 +24,13 @@ __valid_id = Path(..., title="The ID of bookmark to get", ge=1)
 @bookmark_router.get("/", response_model=Page[BookmarkDetailResponse])
 async def list_bookmarks_by_member(
         current_user: UserMe = Security(get_current_user),
+        keyword: Optional[str] = None,
         session: Session = Depends(db.session)
 ) -> AbstractPage:
-    bookmarks = await bookmark_crud.get_bookmarks_by_user_id(session, user_id=current_user.id)
+    if keyword:
+        bookmarks = await bookmark_crud.search_bookmarks_by_keyword(session, current_user.id, keyword)
+    else:
+        bookmarks = await bookmark_crud.get_bookmarks_by_user_id(session, user_id=current_user.id)
     return paginate(bookmarks)
 
 

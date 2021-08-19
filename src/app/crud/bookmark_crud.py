@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
 from app.services import tag_svc
 from core.errors.exceptions import BookmarkUrlDuplicateException
-from database.schema import Bookmarks
+from database.schema import Bookmarks, Tags, bookmark_tag_table
 
 
 async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkCreateRequest):
@@ -46,6 +46,22 @@ async def get_bookmark_by_id(session: Session, user_id: int, bookmark_id: int):
 async def get_bookmarks_by_user_id(session: Session, user_id: int) -> Bookmarks:
     desc_expression = sqlalchemy.sql.expression.desc(Bookmarks.updated_at)
     return session.query(Bookmarks) \
+        .filter_by(user_id=user_id) \
         .order_by(desc_expression) \
-        .options(selectinload(Bookmarks.tags)) \
-        .filter(Bookmarks.user_id == user_id).all()
+        .options(selectinload(Bookmarks.tags)).all()
+
+
+async def search_bookmarks_by_keyword(session: Session, user_id: int, kw: str) -> Bookmarks:
+    search = f"%{kw}%"
+    filter_query = (
+            Bookmarks.title.ilike(search) |
+            Bookmarks.url.ilike(search) |
+            Tags.name.ilike(search)
+    )
+
+    desc_expression = sqlalchemy.sql.expression.desc(Bookmarks.updated_at)
+    return session.query(Bookmarks) \
+        .filter_by(user_id=user_id) \
+        .order_by(desc_expression) \
+        .join(Tags, Bookmarks.tags) \
+        .filter(filter_query).all()

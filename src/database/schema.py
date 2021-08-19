@@ -3,7 +3,7 @@ from sqlalchemy import (
     Integer,
     DateTime,
     func, String,
-    Enum, ForeignKey, Table, UniqueConstraint, )
+    Enum, ForeignKey, Table, UniqueConstraint, PrimaryKeyConstraint, )
 from sqlalchemy.orm import Session, relationship
 from sqlalchemy_utils import ColorType
 
@@ -166,8 +166,9 @@ class BaseMixin:
 
 
 bookmark_tag_table = Table('bookmark_tag', Base.metadata,
-                           Column('bookmark_id', ForeignKey('bookmarks.id', ondelete='cascade'), primary_key=True),
-                           Column('tag_id', ForeignKey('tags.id', ondelete='cascade'), primary_key=True)
+                           Column('bookmark_id', ForeignKey('bookmarks.id', ondelete='cascade')),
+                           Column('tag_id', ForeignKey('tags.id', ondelete='cascade')),
+                           PrimaryKeyConstraint('bookmark_id', 'tag_id')
                            )
 
 
