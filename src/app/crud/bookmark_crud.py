@@ -44,4 +44,8 @@ async def get_bookmark_by_id(session: Session, user_id: int, bookmark_id: int):
 
 
 async def get_bookmarks_by_user_id(session: Session, user_id: int) -> Bookmarks:
-    return session.query(Bookmarks).options(selectinload(Bookmarks.tags)).filter(Bookmarks.user_id == user_id).all()
+    desc_expression = sqlalchemy.sql.expression.desc(Bookmarks.updated_at)
+    return session.query(Bookmarks) \
+        .order_by(desc_expression) \
+        .options(selectinload(Bookmarks.tags)) \
+        .filter(Bookmarks.user_id == user_id).all()

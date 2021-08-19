@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, Path
 from fastapi.params import Security
+from fastapi_pagination import Page, paginate
+from fastapi_pagination.bases import AbstractPage
 from sqlalchemy.orm import Session
 from starlette.requests import Request  # noqa
 
 from app.crud import bookmark_crud
-from app.models.base import CommandResponse
-from app.models.models.bookmarks import BookmarkListResponse, BookmarkDetailResponse, BookmarkCreateRequest, \
+from app.models.models.bookmarks import BookmarkDetailResponse, BookmarkCreateRequest, \
     BookmarkUpdateRequest
 from app.models.models.users import UserMe
 from app.services.user_svc import get_current_user
@@ -18,17 +19,13 @@ bookmark_router = APIRouter(prefix="/bookmarks")
 __valid_id = Path(..., title="The ID of bookmark to get", ge=1)
 
 
-@bookmark_router.get("/", response_model=BookmarkListResponse)
+@bookmark_router.get("/", response_model=Page[BookmarkDetailResponse])
 async def list_bookmarks_by_member(
         current_user: UserMe = Security(get_current_user),
         session: Session = Depends(db.session)
-) -> BookmarkListResponse:
-    # TODO: pagination, ordering
+) -> AbstractPage:
     bookmarks = await bookmark_crud.get_bookmarks_by_user_id(session, user_id=current_user.id)
-    return BookmarkListResponse(
-            bookmarks=bookmarks,
-            bookmarks_count=len(bookmarks)
-    )
+    return paginate(bookmarks)
 
 
 @bookmark_router.post("/", response_model=BookmarkDetailResponse, status_code=201)

@@ -4,6 +4,7 @@ from datetime import datetime
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
 from starlette.middleware.base import BaseHTTPMiddleware  # noqa
 from starlette.middleware.cors import CORSMiddleware  # noqa
 from starlette.responses import Response  # noqa
@@ -38,6 +39,8 @@ def create_app(phase, title="tidify"):
     )
 
     _app.include_router(v1_router)
+
+    add_pagination(_app)
     return _app
 
 
