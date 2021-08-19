@@ -8,9 +8,10 @@ class MessageOk(BaseModel):
 
 
 class SnsType(str, Enum):
-    facebook: str = "facebook"
-    google: str = "google"
+    apple: str = "apple"
     kakao: str = "kakao"
+    google: str = "google"
+
 
 
 class Token(BaseModel):

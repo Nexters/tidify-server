@@ -7,7 +7,7 @@ from fastapi.logger import logger
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from app.services.users import get_user_by_access_token
+from app.services.user_svc import get_user_by_access_token
 from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST, JWT_HEADER_NAME
 from core.errors import exceptions
 from core.errors.exceptions import SqlFailureException, APIException
@@ -43,12 +43,12 @@ async def access_control(request: Request, call_next):
         response = await call_next(request)
         await api_logger(request=request, response=response)
     except Exception as e:
-
         error = await _exception_handler(e)
         error_dict = dict(status=error.status_code, msg=error.msg, detail=error.detail, code=error.code)
         response = JSONResponse(status_code=error.status_code, content=error_dict)
         await api_logger(request=request, error=error)
     return response
+
 
 def _get_access_token_from_header(headers):
     logger.info(headers)
@@ -68,7 +68,7 @@ async def _url_pattern_check(path, pattern):
 async def _exception_handler(error: Exception):
     logger.info(error)
     traceback.print_exc()
-    if isinstance(error, sqlalchemy.exc.OperationalError):
+    if isinstance(error, sqlalchemy.exc.SQLAlchemyError):
         error = SqlFailureException(ex=error)
     if not isinstance(error, APIException):
         error = APIException(ex=error, detail=str(error))

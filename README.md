@@ -50,3 +50,5 @@ $ heroku open
 - [fullstack-fastapi-repo](https://github.com/tiangolo/full-stack-fastapi-postgresql)
 - [fastapi-realworld-example-app](https://github.com/nsidnev/fastapi-realworld-example-app)
 - [heroku-docker-compose](https://devcenter.heroku.com/articles/local-development-with-docker-compose)
+- [many-to many in sqlalchemy with primary join](https://stackoverflow.com/questions/47327410/sqlalchemy-relationship-with-secondary-table-joining-behaviour-changes-between-l)
+- [search in sqlalchemy ilike](https://wikidocs.net/81067#_4)

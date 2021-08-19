@@ -1,21 +1,67 @@
-from sqlalchemy.orm import Session
+import psycopg2
+import sqlalchemy
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
-from database.schema import Bookmarks
+from app.services import tag_svc
+from core.errors.exceptions import BookmarkUrlDuplicateException
+from database.schema import Bookmarks, Tags, bookmark_tag_table
 
 
-async def create_bookmark(session: Session, user_id, bookmark_in: BookmarkCreateRequest):
-    return Bookmarks.create(session=session, auto_commit=True, user_id=user_id, **bookmark_in.dict())
+async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkCreateRequest):
+    try:
+        bookmark = Bookmarks.create(session=session, auto_commit=False, user_id=user_id, **bookmark_in.dict())
+    except sqlalchemy.exc.IntegrityError as err:
+        if isinstance(err.orig, psycopg2.errors.UniqueViolation):
+            raise BookmarkUrlDuplicateException(url=bookmark_in.url)
+
+    if bookmark_in.tags:
+        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
+        bookmark.tags.extend(exist_tags)
+        bookmark.tags.extend(new_tags)
+    session.commit()
+    return bookmark
 
 
-async def get_bookmark_by_id(session: Session, bookmark_id: int):
-    return Bookmarks.filter(session=session, id=bookmark_id).first()
+async def update_bookmark(session: Session, user_id: int, bookmark_id: int, bookmark_in: BookmarkUpdateRequest):
+    bookmark = await get_bookmark_by_id(session, user_id, bookmark_id)
+    bookmark.tags.clear()
+
+    if bookmark_in.tags:
+        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
+        bookmark.tags.extend(exist_tags)
+        bookmark.tags.extend(new_tags)
+
+    bookmark_update_data = bookmark_in.dict(exclude={"tags"}, exclude_unset=True)
+    for key, value in bookmark_update_data.items():
+        setattr(bookmark, key, value)
+    session.commit()
+    return bookmark
 
 
-async def get_bookmarks_by_user_id(session: Session, user_id: int):
-    return Bookmarks.filter(session=session, user_id=user_id).all()
+async def get_bookmark_by_id(session: Session, user_id: int, bookmark_id: int):
+    return Bookmarks.filter(session=session, id=bookmark_id, user_id=user_id).first()
 
 
-def update_bookmark(session: Session, user_id: int, bookmark_id: int, bookmark_in: BookmarkUpdateRequest):
-    return Bookmarks.filter(session=session, id=bookmark_id).update(auto_commit=True, user_id=user_id,
-                                                                    **bookmark_in.dict())
+async def get_bookmarks_by_user_id(session: Session, user_id: int) -> Bookmarks:
+    desc_expression = sqlalchemy.sql.expression.desc(Bookmarks.updated_at)
+    return session.query(Bookmarks) \
+        .filter_by(user_id=user_id) \
+        .order_by(desc_expression) \
+        .options(selectinload(Bookmarks.tags)).all()
+
+
+async def search_bookmarks_by_keyword(session: Session, user_id: int, kw: str) -> Bookmarks:
+    search = f"%{kw}%"
+    filter_query = (
+            Bookmarks.title.ilike(search) |
+            Bookmarks.url.ilike(search) |
+            Tags.name.ilike(search)
+    )
+
+    desc_expression = sqlalchemy.sql.expression.desc(Bookmarks.updated_at)
+    return session.query(Bookmarks) \
+        .filter_by(user_id=user_id) \
+        .order_by(desc_expression) \
+        .join(Tags, Bookmarks.tags) \
+        .filter(filter_query).all()

@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.crud import user_crud
 from app.models.models.users import UserInput, UserToken
-from app.services.auth import create_access_token
-from core.consts import Phase
+from app.services.auth_svc import create_access_token
+from core.consts import Phase, JWT_HEADER_NAME
 from database.conn import Base, db
 from main import create_app
 
@@ -64,7 +64,7 @@ async def access_token(session) -> typing.Dict:
     user = await user_crud.get_user_by_email(session, mock_user_input.email)
     session.commit()
     user_token = UserToken.from_orm(user)
-    app_token = dict(Authorization=f"Bearer {create_access_token(user_token)}")
+    app_token = {JWT_HEADER_NAME: f"Bearer {create_access_token(user_token)}"}
     return app_token
 
 

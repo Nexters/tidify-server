@@ -3,10 +3,12 @@ from sqlalchemy import (
     Integer,
     DateTime,
     func, String,
-    Enum, ForeignKey,
-)
+    Enum, ForeignKey, Table, UniqueConstraint, PrimaryKeyConstraint, )
 from sqlalchemy.orm import Session, relationship
+from sqlalchemy_utils import ColorType
 
+from app.models.models.users import SnsType
+from core.consts import MaxLength
 from database.conn import db, Base
 
 
@@ -127,7 +129,6 @@ class BaseMixin:
 
     def update(self, auto_commit: bool = False, **kwargs):
         qs = self._q.update(kwargs)
-        get_id = self.id
         ret = None
 
         self._session.flush()
@@ -148,7 +149,6 @@ class BaseMixin:
             self._session.commit()
 
     def all(self):
-        print(self.served)
         result = self._q.all()
         self.close()
         return result
@@ -165,22 +165,53 @@ class BaseMixin:
             self._session.flush()
 
 
+bookmark_tag_table = Table('bookmark_tag', Base.metadata,
+                           Column('bookmark_id', ForeignKey('bookmarks.id', ondelete='cascade')),
+                           Column('tag_id', ForeignKey('tags.id', ondelete='cascade')),
+                           PrimaryKeyConstraint('bookmark_id', 'tag_id')
+                           )
+
+
 class Bookmarks(Base, BaseMixin):
     __tablename__ = "bookmarks"
-    title = Column("title", String(50))
-    url = Column("url", String(1000))
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    users = relationship("Users")
+    __table_args__ = (
+        UniqueConstraint('user_id', 'url', ),
+    )
+
+    url = Column("url", String(MaxLength.url), unique=True)
+    title = Column("title", String(MaxLength.title), nullable=True)
+    og_img_url = Column("og_img_url", String(MaxLength.url), nullable=True, comment="og 이미지 url")
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+
+    users = relationship("Users", back_populates="bookmarks")
+
+    tags = relationship(
+            "Tags",
+            secondary=bookmark_tag_table,
+            backref="bookmarks")
+
+
+# TODO: primary tag 관리
+class Tags(Base, BaseMixin):
+    __tablename__ = "tags"
+
+    name = Column("name", String(MaxLength.title), unique=True, index=True)
+    # https://github.com/kvesteri/sqlalchemy-utils/blob/master/sqlalchemy_utils/types/color.py
+    color = Column(ColorType)
 
 
 class Users(Base, BaseMixin):
     __tablename__ = "users"
+
     status = Column(Enum("active", "deleted", "blocked", name="status"), default="active")
-    email = Column(String(length=255), nullable=True, unique=True)
-    name = Column(String(length=255), nullable=True)
-    profile_img = Column(String(length=1000), nullable=True)
-    sns_type = Column(Enum("facebook", "google", "kakao", name="sns_type"), nullable=True)
+    email = Column(String(length=MaxLength.email), nullable=True, unique=True)
+    name = Column(String(length=MaxLength.base), nullable=True)
+    profile_img = Column(String(length=MaxLength.url), nullable=True)
+    sns_type = Column(Enum("apple", "kakao", "google", name="sns_type"), nullable=True, default=SnsType.kakao)
+
+    bookmarks = relationship("Bookmarks", back_populates="users", cascade="all, delete-orphan")
 
 
 # alembic env.py에서 table auto search가 안된다면 import 해주어야 한다.
-__all__ = ['Bookmarks', 'Users']
+__all__ = ['Bookmarks', 'Tags', 'Users']

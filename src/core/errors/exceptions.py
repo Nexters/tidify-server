@@ -85,13 +85,22 @@ class BookmarkNotFoundException(APIException):
                 ex=ex,
         )
 
+class BookmarkUrlDuplicateException(APIException):
+    def __init__(self, url: str, ex: Exception = None):
+        super().__init__(
+                msg=f"{url}에 해당하는 북마크가 이미 존재합니다.",
+                status_code=StatusCode.HTTP_400,
+                detail="Bookmark Url Duplicate Error",
+                code=f"{StatusCode.HTTP_400}{'1'.zfill(4)}",
+                ex=ex,
+        )
 
 class SqlFailureException(APIException):
     def __init__(self, ex: Exception = None):
         super().__init__(
                 status_code=StatusCode.HTTP_500,
-                msg=f"이 에러는 서버측 에러 입니다. 자동으로 리포팅 되며, 빠르게 수정하겠습니다.",
-                detail="Internal Server Error",
+                msg=f"이 에러는 서버 DB측 에러 입니다. 빠르게 수정하겠습니다.",
+                detail=str(ex),
                 code=f"{StatusCode.HTTP_500}{'1'.zfill(4)}",
                 ex=ex,
         )
