@@ -8,6 +8,7 @@ from app.models.models.tags import TagCreateRequest, TagUpdateRequest
 from core.errors.exceptions import TagDuplicateException
 from database.schema import Tags
 
+
 # TODO: 제거
 async def create_tags_by_names(session: Session, tag_names: List[str]):
     tags = [Tags(name=name) for name in tag_names]
@@ -37,5 +38,9 @@ async def update_tag(session: Session, user_id: int, tag_id: int, tag_in: TagUpd
     return tag
 
 
-def get_tag_by_id(session: Session, user_id: int, tag_id: int):
+async def get_tag_by_id(session: Session, user_id: int, tag_id: int):
     return Tags.filter(session=session, id=tag_id, user_id=user_id).first()
+
+
+async def get_tags_by_user_id(session: Session, user_id: int):
+    return Tags.filter(session=session, user_id=user_id).order_by('-updated_at').all()

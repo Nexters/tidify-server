@@ -10,7 +10,7 @@ from core.consts import MaxLength
 class Tag(OrmModel):
     id: int
     name: str = Field(min_length=1, max_length=MaxLength.title)
-    color: Color
+    color: str
 
 
 class TagDetailResponse(Tag):

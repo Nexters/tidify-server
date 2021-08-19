@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Path
 from fastapi.params import Security
+from fastapi_pagination import Page, paginate
+from fastapi_pagination.bases import AbstractPage
 from sqlalchemy.orm import Session
 
 from app.crud import tag_crud
@@ -11,6 +13,15 @@ from database.conn import db
 
 tag_router = APIRouter(prefix="/tags")
 __valid_id = Path(..., title="The ID of hash tag to get", ge=1)
+
+
+@tag_router.get("/", response_model=Page[TagDetailResponse])
+async def list_tags(
+        current_user: UserMe = Security(get_current_user),
+        session: Session = Depends(db.session)
+) -> AbstractPage:
+    tags = await tag_crud.get_tags_by_user_id(session, user_id=current_user.id)
+    return paginate(tags)
 
 
 @tag_router.post("/", response_model=TagDetailResponse, status_code=201)
