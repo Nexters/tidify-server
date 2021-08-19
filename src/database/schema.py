@@ -5,7 +5,6 @@ from sqlalchemy import (
     func, String,
     Enum, ForeignKey, Table, UniqueConstraint, PrimaryKeyConstraint, )
 from sqlalchemy.orm import Session, relationship
-from sqlalchemy_utils import ColorType
 
 from app.models.models.users import SnsType
 from core.consts import MaxLength
@@ -165,6 +164,7 @@ class BaseMixin:
             self._session.flush()
 
 
+# TODO: primary tag 관리
 bookmark_tag_table = Table('bookmark_tag', Base.metadata,
                            Column('bookmark_id', ForeignKey('bookmarks.id', ondelete='cascade')),
                            Column('tag_id', ForeignKey('tags.id', ondelete='cascade')),
@@ -183,7 +183,6 @@ class Bookmarks(Base, BaseMixin):
     og_img_url = Column("og_img_url", String(MaxLength.url), nullable=True, comment="og 이미지 url")
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-
     users = relationship("Users", back_populates="bookmarks")
 
     tags = relationship(
@@ -192,13 +191,16 @@ class Bookmarks(Base, BaseMixin):
             backref="bookmarks")
 
 
-# TODO: primary tag 관리
 class Tags(Base, BaseMixin):
     __tablename__ = "tags"
 
-    name = Column("name", String(MaxLength.title), unique=True, index=True)
-    # https://github.com/kvesteri/sqlalchemy-utils/blob/master/sqlalchemy_utils/types/color.py
-    color = Column(ColorType)
+    name = Column("name", String(MaxLength.title), nullable=False)
+    color = Column("color", String(MaxLength.color), nullable=False, comment="hex color")
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    users = relationship("Users", back_populates="tags")
+
+    UniqueConstraint('name', 'user_id', name="tag_uidx")
 
 
 class Users(Base, BaseMixin):
@@ -211,6 +213,7 @@ class Users(Base, BaseMixin):
     sns_type = Column(Enum("apple", "kakao", "google", name="sns_type"), nullable=True, default=SnsType.kakao)
 
     bookmarks = relationship("Bookmarks", back_populates="users", cascade="all, delete-orphan")
+    tags = relationship("Tags", back_populates="users", cascade="all, delete-orphan")
 
 
 # alembic env.py에서 table auto search가 안된다면 import 해주어야 한다.

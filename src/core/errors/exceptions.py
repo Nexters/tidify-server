@@ -95,6 +95,16 @@ class BookmarkUrlDuplicateException(APIException):
                 ex=ex,
         )
 
+class TagDuplicateException(APIException):
+    def __init__(self, user_id: int, tag_name: str, ex: Exception = None):
+        super().__init__(
+                msg=f"사용자({user_id})는 이미 {tag_name}에 해당하는 해시태그를 가지고 있습니다.",
+                status_code=StatusCode.HTTP_400,
+                detail="Tag name duplicate Error",
+                code=f"{StatusCode.HTTP_400}{'1'.zfill(4)}",
+                ex=ex,
+        )
+
 class SqlFailureException(APIException):
     def __init__(self, ex: Exception = None):
         super().__init__(

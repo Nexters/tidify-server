@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
 from app.services import tag_svc
 from core.errors.exceptions import BookmarkUrlDuplicateException
-from database.schema import Bookmarks, Tags, bookmark_tag_table
+from database.schema import Bookmarks, Tags
 
 
 async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkCreateRequest):

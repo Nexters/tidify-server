@@ -19,3 +19,4 @@ class MaxLength:
     email = 255
     url = 1000
     title = 50
+    color = 20
