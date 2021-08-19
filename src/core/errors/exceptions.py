@@ -1,3 +1,6 @@
+from typing import List
+
+
 class StatusCode:
     HTTP_500 = 500
     HTTP_400 = 400
@@ -85,6 +88,7 @@ class BookmarkNotFoundException(APIException):
                 ex=ex,
         )
 
+
 class TagNotFoundException(APIException):
     def __init__(self, tag_id: int, ex: Exception = None):
         super().__init__(
@@ -94,6 +98,7 @@ class TagNotFoundException(APIException):
                 code=f"{StatusCode.HTTP_404}{'1'.zfill(4)}",
                 ex=ex,
         )
+
 
 class BookmarkUrlDuplicateException(APIException):
     def __init__(self, url: str, ex: Exception = None):
@@ -105,6 +110,7 @@ class BookmarkUrlDuplicateException(APIException):
                 ex=ex,
         )
 
+
 class TagDuplicateException(APIException):
     def __init__(self, user_id: int, tag_name: str, ex: Exception = None):
         super().__init__(
@@ -114,6 +120,18 @@ class TagDuplicateException(APIException):
                 code=f"{StatusCode.HTTP_400}{'1'.zfill(4)}",
                 ex=ex,
         )
+
+
+class InvalidTagIdExistException(APIException):
+    def __init__(self, tag_ids: List[int], exist_ids: List[int], ex: Exception = None):
+        super().__init__(
+                msg=f"입력된 {tag_ids}에는 부적절한 태그 id가 포함 되어있습니다. 현재 존재하는 태그 ids: {exist_ids}",
+                status_code=StatusCode.HTTP_400,
+                detail=f"Invalid Tag is given",
+                code=f"{StatusCode.HTTP_400}{'1'.zfill(4)}",
+                ex=ex,
+        )
+
 
 class SqlFailureException(APIException):
     def __init__(self, ex: Exception = None):

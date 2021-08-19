@@ -5,15 +5,8 @@ import sqlalchemy
 from sqlalchemy.orm import Session
 
 from app.models.models.tags import TagCreateRequest, TagUpdateRequest
-from core.errors.exceptions import TagDuplicateException
+from core.errors.exceptions import TagDuplicateException, InvalidTagIdExistException
 from database.schema import Tags
-
-
-# TODO: 제거
-async def create_tags_by_names(session: Session, tag_names: List[str]):
-    tags = [Tags(name=name) for name in tag_names]
-    session.bulk_save_objects(tags, return_defaults=True)  # return_defaults: session에 기록
-    return tags
 
 
 async def create_tag(session: Session, user_id: int, tag_in: TagCreateRequest):
@@ -40,6 +33,14 @@ async def update_tag(session: Session, user_id: int, tag_id: int, tag_in: TagUpd
 
 async def get_tag_by_id(session: Session, user_id: int, tag_id: int):
     return Tags.filter(session=session, id=tag_id, user_id=user_id).first()
+
+
+async def get_tags_by_ids(session: Session, user_id: int, tag_ids: List[int]):
+    tags = Tags.filter(session=session, id__in=tag_ids, user_id=user_id).all()
+    if len(tags) != len(tag_ids):
+        exist_tag_ids = [t.id for t in tags]
+        raise InvalidTagIdExistException(tag_ids=tag_ids, exist_ids=exist_tag_ids)
+    return tags
 
 
 async def get_tags_by_user_id(session: Session, user_id: int):
