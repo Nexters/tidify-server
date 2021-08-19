@@ -2,10 +2,10 @@ import psycopg2
 import sqlalchemy
 from sqlalchemy.orm import Session, selectinload
 
+from app.crud import tag_crud
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
-from app.services import tag_svc
 from core.errors.exceptions import BookmarkUrlDuplicateException
-from database.schema import Bookmarks, Tags, bookmark_tag_table
+from database.schema import Bookmarks, Tags
 
 
 async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkCreateRequest):
@@ -16,9 +16,8 @@ async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkC
             raise BookmarkUrlDuplicateException(url=bookmark_in.url)
 
     if bookmark_in.tags:
-        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
-        bookmark.tags.extend(exist_tags)
-        bookmark.tags.extend(new_tags)
+        tags = await tag_crud.get_tags_by_ids(session, user_id,bookmark_in.tags)
+        bookmark.tags.extend(tags)
     session.commit()
     return bookmark
 
@@ -28,9 +27,8 @@ async def update_bookmark(session: Session, user_id: int, bookmark_id: int, book
     bookmark.tags.clear()
 
     if bookmark_in.tags:
-        exist_tags, new_tags = await tag_svc.get_tags_and_create_tags_if_not_exist(session, bookmark_in.tags)
-        bookmark.tags.extend(exist_tags)
-        bookmark.tags.extend(new_tags)
+        tags = await tag_crud.get_tags_by_ids(session, user_id, bookmark_in.tags)
+        bookmark.tags.extend(tags)
 
     bookmark_update_data = bookmark_in.dict(exclude={"tags"}, exclude_unset=True)
     for key, value in bookmark_update_data.items():

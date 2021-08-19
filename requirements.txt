@@ -40,7 +40,6 @@ six==1.16.0
 sniffio==1.2.0
 soupsieve==2.2.1
 SQLAlchemy==1.4.22
-SQLAlchemy-Utils==0.37.8
 starlette==0.14.2
 toml==0.10.2
 typing-extensions==3.10.0.0
