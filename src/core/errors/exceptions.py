@@ -85,6 +85,16 @@ class BookmarkNotFoundException(APIException):
                 ex=ex,
         )
 
+class TagNotFoundException(APIException):
+    def __init__(self, tag_id: int, ex: Exception = None):
+        super().__init__(
+                msg=f"{tag_id}에 해당하는 해시태그가 없습니다",
+                status_code=StatusCode.HTTP_404,
+                detail="Tag Not Found Error",
+                code=f"{StatusCode.HTTP_404}{'1'.zfill(4)}",
+                ex=ex,
+        )
+
 class BookmarkUrlDuplicateException(APIException):
     def __init__(self, url: str, ex: Exception = None):
         super().__init__(

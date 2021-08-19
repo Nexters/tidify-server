@@ -8,8 +8,10 @@ from app.crud import tag_crud
 from app.models.models.tags import TagCreateRequest, TagDetailResponse, TagUpdateRequest
 from app.models.models.users import UserMe
 from app.services.user_svc import get_current_user
+from core.errors import exceptions
 from core.utils.query_utils import to_dict
 from database.conn import db
+from database.schema import Tags
 
 tag_router = APIRouter(prefix="/tags")
 __valid_id = Path(..., title="The ID of hash tag to get", ge=1)
@@ -53,3 +55,16 @@ async def update_tag(
 ) -> TagDetailResponse:
     tag = await tag_crud.update_tag(session, current_user.id, tag_id, tag_in)
     return TagDetailResponse(**to_dict(tag))
+
+
+@tag_router.delete("/{tag_id}", status_code=204)
+async def delete_tag(
+        tag_id: int = __valid_id,
+        current_user: UserMe = Security(get_current_user),
+        session: Session = Depends(db.session)
+) -> None:
+    tag = Tags.filter(session=session, id=tag_id, user_id=current_user.id)
+
+    if not tag.first():
+        raise exceptions.TagNotFoundException(tag_id=tag_id)
+    tag.delete(auto_commit=True)
