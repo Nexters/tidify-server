@@ -4,7 +4,7 @@ from sqlalchemy import (
     DateTime,
     func, String,
     Enum, ForeignKey, Table, UniqueConstraint, PrimaryKeyConstraint, )
-from sqlalchemy.orm import Session, relationship
+from sqlalchemy.orm import Session, relationship, backref
 
 from app.models.models.users import SnsType
 from core.consts import MaxLength
@@ -164,7 +164,6 @@ class BaseMixin:
             self._session.flush()
 
 
-# TODO: primary tag 관리
 bookmark_tag_table = Table('bookmark_tag', Base.metadata,
                            Column('bookmark_id', ForeignKey('bookmarks.id', ondelete='cascade')),
                            Column('tag_id', ForeignKey('tags.id', ondelete='cascade')),
@@ -185,17 +184,35 @@ class Bookmarks(Base, BaseMixin):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     users = relationship("Users", back_populates="bookmarks")
 
+    # https://stackoverflow.com/a/16589154
+    folder_id = Column(Integer,
+                       ForeignKey('folders.id', ondelete='CASCADE'),
+                       nullable=True,
+                       comment="북마크와 연결된 폴더, null인 경우 / 루트로 간주한다.")
+    folder = relationship('Folders', backref=backref('Bookmarks', passive_deletes=True))
+
     tags = relationship(
             "Tags",
             secondary=bookmark_tag_table,
             backref="bookmarks")
 
 
+class Folders(Base, BaseMixin):
+    __tablename__ = "folders"
+
+    name = Column("name", String(MaxLength.title), nullable=False)
+    color = Column("color", String(MaxLength.color), nullable=False, comment="hex color")
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    users = relationship("Users", back_populates="folders")
+
+    UniqueConstraint('name', 'user_id', name="folder_uidx")
+
+
 class Tags(Base, BaseMixin):
     __tablename__ = "tags"
 
     name = Column("name", String(MaxLength.title), nullable=False)
-    color = Column("color", String(MaxLength.color), nullable=False, comment="hex color")
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     users = relationship("Users", back_populates="tags")
@@ -214,7 +231,8 @@ class Users(Base, BaseMixin):
 
     bookmarks = relationship("Bookmarks", back_populates="users", cascade="all, delete-orphan")
     tags = relationship("Tags", back_populates="users", cascade="all, delete-orphan")
+    folders = relationship("Folders", back_populates="users", cascade="all, delete-orphan")
 
 
 # alembic env.py에서 table auto search가 안된다면 import 해주어야 한다.
-__all__ = ['Bookmarks', 'Tags', 'Users']
+__all__ = ['Bookmarks', 'Tags', 'Users', 'Folders']
