@@ -41,7 +41,7 @@ async def create_bookmark(
         session: Session = Depends(db.session)
 ) -> BookmarkDetailResponse:
     bookmark = await bookmark_crud.create_bookmark(session, current_user.id, bookmark_in)
-    return BookmarkDetailResponse(tags=bookmark.tags, **to_dict(bookmark))
+    return BookmarkDetailResponse(folder=bookmark.folder, tags=bookmark.tags, **to_dict(bookmark))
 
 
 @bookmark_router.get("/{bookmark_id}", response_model=BookmarkDetailResponse, status_code=200)
@@ -51,7 +51,7 @@ async def retrieve_bookmark(
         session: Session = Depends(db.session)
 ) -> BookmarkDetailResponse:
     bookmark = await bookmark_crud.get_bookmark_by_id(session, current_user.id, bookmark_id)
-    return BookmarkDetailResponse(tags=bookmark.tags, **to_dict(bookmark))
+    return BookmarkDetailResponse(folder=bookmark.folder, tags=bookmark.tags, **to_dict(bookmark))
 
 
 @bookmark_router.patch("/{bookmark_id}", response_model=BookmarkDetailResponse, status_code=201)
@@ -62,7 +62,7 @@ async def update_bookmark(
         session: Session = Depends(db.session)
 ) -> BookmarkDetailResponse:
     bookmark = await bookmark_crud.update_bookmark(session, current_user.id, bookmark_id, bookmark_in)
-    return BookmarkDetailResponse(tags=bookmark.tags, **to_dict(bookmark))
+    return BookmarkDetailResponse(folder=bookmark.folder, tags=bookmark.tags, **to_dict(bookmark))
 
 
 @bookmark_router.delete("/{bookmark_id}", status_code=204)
