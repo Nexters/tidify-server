@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.crud import tag_crud
 from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
-from core.errors.exceptions import BookmarkUrlDuplicateException
-from database.schema import Bookmarks, Tags
+from core.errors.exceptions import BookmarkUrlDuplicateException, FolderNotFoundException
+from database.schema import Bookmarks, Tags, Folders
 
 
 async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkCreateRequest):
@@ -14,9 +14,12 @@ async def create_bookmark(session: Session, user_id: int, bookmark_in: BookmarkC
     except sqlalchemy.exc.IntegrityError as err:
         if isinstance(err.orig, psycopg2.errors.UniqueViolation):
             raise BookmarkUrlDuplicateException(url=bookmark_in.url)
+        if isinstance(err.orig, psycopg2.errors.ForeignKeyViolation):
+            raise FolderNotFoundException(folder_id=bookmark_in.folder_id)
+        raise err
 
     if bookmark_in.tags:
-        tags = await tag_crud.get_tags_by_ids(session, user_id,bookmark_in.tags)
+        tags = await tag_crud.get_tags_by_ids(session, user_id, bookmark_in.tags)
         bookmark.tags.extend(tags)
     session.commit()
     return bookmark
@@ -54,12 +57,14 @@ async def search_bookmarks_by_keyword(session: Session, user_id: int, kw: str) -
     filter_query = (
             Bookmarks.title.ilike(search) |
             Bookmarks.url.ilike(search) |
-            Tags.name.ilike(search)
+            Tags.name.ilike(search) |
+            Folders.name.ilike(search)
     )
 
     desc_expression = sqlalchemy.sql.expression.desc(Bookmarks.updated_at)
     return session.query(Bookmarks) \
         .filter_by(user_id=user_id) \
         .order_by(desc_expression) \
-        .join(Tags, Bookmarks.tags) \
-        .filter(filter_query).all()
+        .outerjoin(Folders, Bookmarks.folder_id == Folders.id) \
+        .outerjoin(Tags, Bookmarks.tags) \
+        .filter(filter_query).distinct().all()

@@ -99,6 +99,16 @@ class TagNotFoundException(APIException):
                 ex=ex,
         )
 
+class FolderNotFoundException(APIException):
+    def __init__(self, folder_id: int, ex: Exception = None):
+        super().__init__(
+                msg=f"{folder_id}에 해당하는 폴더가 없습니다",
+                status_code=StatusCode.HTTP_404,
+                detail="Folder Not Found Error",
+                code=f"{StatusCode.HTTP_404}{'1'.zfill(4)}",
+                ex=ex,
+        )
+
 
 class BookmarkUrlDuplicateException(APIException):
     def __init__(self, url: str, ex: Exception = None):
@@ -117,6 +127,16 @@ class TagDuplicateException(APIException):
                 msg=f"사용자({user_id})는 이미 {tag_name}에 해당하는 해시태그를 가지고 있습니다.",
                 status_code=StatusCode.HTTP_400,
                 detail="Tag name duplicate Error",
+                code=f"{StatusCode.HTTP_400}{'1'.zfill(4)}",
+                ex=ex,
+        )
+
+class FolderDuplicateException(APIException):
+    def __init__(self, user_id: int, folder_name: str, ex: Exception = None):
+        super().__init__(
+                msg=f"사용자({user_id})는 이미 {folder_name}에 해당하는 폴더를 가지고 있습니다.",
+                status_code=StatusCode.HTTP_400,
+                detail="Folder name duplicate Error",
                 code=f"{StatusCode.HTTP_400}{'1'.zfill(4)}",
                 ex=ex,
         )

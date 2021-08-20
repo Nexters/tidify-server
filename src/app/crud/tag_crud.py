@@ -10,22 +10,19 @@ from database.schema import Tags
 
 
 async def create_tag(session: Session, user_id: int, tag_in: TagCreateRequest):
-    name = tag_in.name
-    color = tag_in.color.as_hex()
     try:
-        tag = Tags.create(session=session, auto_commit=True, user_id=user_id, name=name, color=color)
+        tag = Tags.create(session=session, auto_commit=True, user_id=user_id, **tag_in.dict())
+        return tag
     except sqlalchemy.exc.IntegrityError as err:
         if isinstance(err.orig, psycopg2.errors.UniqueViolation):
             raise TagDuplicateException(user_id, tag_in.name)
-    return tag
+        raise err
 
 
 async def update_tag(session: Session, user_id: int, tag_id: int, tag_in: TagUpdateRequest):
     tag = get_tag_by_id(session, user_id, tag_id)
     tag_update_data = tag_in.dict(exclude_unset=True)
     for key, value in tag_update_data.items():
-        if key == 'color':
-            value = value.as_hex()
         setattr(tag, key, value)
     session.commit()
     return tag

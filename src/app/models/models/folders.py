@@ -1,23 +1,27 @@
 from typing import Optional
 
 from pydantic import Field
+from pydantic.color import Color
 
 from app.models.base import OrmModel
 from core.consts import MaxLength
 
 
-class Tag(OrmModel):
+class Folder(OrmModel):
     id: int
     name: str = Field(min_length=1, max_length=MaxLength.title)
+    color: str
 
 
-class TagDetailResponse(Tag):
+class FolderDetailResponse(Folder):
     pass
 
 
-class TagCreateRequest(OrmModel):
+class FolderCreateRequest(OrmModel):
     name: str = Field(min_length=1, max_length=MaxLength.title)
+    color: Color
 
 
-class TagUpdateRequest(TagCreateRequest):
+class FolderUpdateRequest(FolderCreateRequest):
     name: Optional[str] = Field(min_length=1, max_length=MaxLength.title)
+    color: Optional[Color]
