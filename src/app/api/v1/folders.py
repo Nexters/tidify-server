@@ -22,7 +22,11 @@ async def list_folders(
         current_user: UserMe = Security(get_current_user),
         session: Session = Depends(db.session)
 ) -> AbstractPage:
+    """
     # TODO: 폴더에 북마크 정보 추가해서 제공
+    - 비워져 있다면 root로 북마크들이 저장됨
+    - 비워져 있지 않으면 해당 폴더에 들어감
+    """
     folders = await folder_crud.get_folders_by_user_id(session, user_id=current_user.id)
     return paginate(folders)
 

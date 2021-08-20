@@ -65,6 +65,6 @@ async def search_bookmarks_by_keyword(session: Session, user_id: int, kw: str) -
     return session.query(Bookmarks) \
         .filter_by(user_id=user_id) \
         .order_by(desc_expression) \
-        .join(Tags, Bookmarks.tags) \
-        .join(Folders, Bookmarks.folder_id == Folders.id) \
+        .outerjoin(Folders, Bookmarks.folder_id == Folders.id) \
+        .outerjoin(Tags, Bookmarks.tags) \
         .filter(filter_query).distinct().all()

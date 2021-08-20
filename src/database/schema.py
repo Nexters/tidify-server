@@ -186,10 +186,10 @@ class Bookmarks(Base, BaseMixin):
 
     # https://stackoverflow.com/a/16589154
     folder_id = Column(Integer,
-                       ForeignKey('folders.id', ondelete='CASCADE'),
+                       ForeignKey('folders.id', ondelete='SET NULL'),
                        nullable=True,
                        comment="북마크와 연결된 폴더, null인 경우 / 루트로 간주한다.")
-    folder = relationship('Folders', backref=backref('Bookmarks', passive_deletes=True))
+    folder = relationship('Folders', backref=backref('Bookmarks'))
 
     tags = relationship(
             "Tags",
@@ -199,6 +199,7 @@ class Bookmarks(Base, BaseMixin):
 
 class Folders(Base, BaseMixin):
     __tablename__ = "folders"
+    __table_args__ = (UniqueConstraint('name', 'user_id', name="folder_uidx"),)
 
     name = Column("name", String(MaxLength.title), nullable=False)
     color = Column("color", String(MaxLength.color), nullable=False, comment="hex color")
@@ -206,18 +207,15 @@ class Folders(Base, BaseMixin):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     users = relationship("Users", back_populates="folders")
 
-    UniqueConstraint('name', 'user_id', name="folder_uidx")
-
 
 class Tags(Base, BaseMixin):
     __tablename__ = "tags"
+    __table_args__ = (UniqueConstraint('name', 'user_id', name="tag_uidx"),)
 
     name = Column("name", String(MaxLength.title), nullable=False)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     users = relationship("Users", back_populates="tags")
-
-    UniqueConstraint('name', 'user_id', name="tag_uidx")
 
 
 class Users(Base, BaseMixin):
