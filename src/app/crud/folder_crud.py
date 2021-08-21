@@ -15,7 +15,7 @@ async def create_folder(session: Session, user_id: int, folder_in: FolderCreateR
         return folder
     except sqlalchemy.exc.IntegrityError as err:
         if isinstance(err.orig, psycopg2.errors.UniqueViolation):
-            raise FolderDuplicateException(user_id, folder.name)
+            raise FolderDuplicateException(user_id, name)
         raise err
 
 
