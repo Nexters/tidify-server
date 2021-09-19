@@ -21,7 +21,8 @@ _SECRET_KEY = hashlib.sha256(os.urandom(1024)).hexdigest()
 oauth_client = FastAPI()
 oauth_client.add_middleware(SessionMiddleware, secret_key=_SECRET_KEY)
 
-config = Config(".google.env")
+# os.getenv
+config = Config()
 oauth = OAuth(config)
 oauth.register(
     name='google',
