@@ -1,11 +1,5 @@
 from enum import Enum
 
-JWT_SECRET = "ABCD1234!"
-JWT_ALGORITHM = "HS256"
-EXCEPT_PATH_LIST = ["/", "/openapi.json"]
-API_VERSION_PREFIX: str = "/api/v1"
-EXCEPT_PATH_REGEX = f"^(/docs|/redoc|{API_VERSION_PREFIX}/auth)"
-JWT_HEADER_NAME = "tidify-auth"
 
 class Phase(str, Enum):
     test: str = "test"
@@ -20,3 +14,15 @@ class MaxLength:
     url = 1000
     title = 50
     color = 20
+
+
+JWT_SECRET = "ABCD1234!"
+JWT_ALGORITHM = "HS256"
+EXCEPT_PATH_LIST = ["/", "/openapi.json"]
+API_VERSION_PREFIX: str = "/api/v1"
+EXCEPT_PATH_REGEX = f"^(/docs|/redoc|{API_VERSION_PREFIX}/oauth)"
+JWT_HEADER_NAME = "tidify-oauth"
+
+GOOGLE_APIS = {
+    'user_info': 'https://openidconnect.googleapis.com/v1/userinfo?access_token={access_token}'
+}

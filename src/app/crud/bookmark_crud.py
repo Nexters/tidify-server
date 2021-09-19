@@ -3,7 +3,7 @@ import sqlalchemy
 from sqlalchemy.orm import Session, selectinload
 
 from app.crud import tag_crud
-from app.models.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
+from app.models.bookmarks import BookmarkCreateRequest, BookmarkUpdateRequest
 from core.errors.exceptions import BookmarkUrlDuplicateException, FolderNotFoundException
 from database.schema import Bookmarks, Tags, Folders
 

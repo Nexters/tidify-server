@@ -204,6 +204,7 @@ celerybeat.pid
 # Environments
 .env
 .env.*
+*/.google.*
 .venv
 env/
 venv/

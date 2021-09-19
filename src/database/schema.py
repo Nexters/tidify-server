@@ -6,7 +6,7 @@ from sqlalchemy import (
     Enum, ForeignKey, Table, UniqueConstraint, PrimaryKeyConstraint, )
 from sqlalchemy.orm import Session, relationship, backref
 
-from app.models.models.users import SnsType
+from app.models.users import SnsType
 from core.consts import MaxLength
 from database.conn import db, Base
 

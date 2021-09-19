@@ -3,11 +3,13 @@ import jwt
 from fastapi.logger import logger
 from fastapi.security import APIKeyHeader
 from jwt import ExpiredSignatureError, DecodeError
+from starlette.responses import RedirectResponse
 
-from app.models.models.kakao import KakaoUserMeResponse
-from app.models.models.users import UserToken
+from app.models.google import GoogleAuthInfo
+from app.models.kakao import KakaoUserMeResponse
+from app.models.users import UserToken, UserInput
 from core import consts
-from core.consts import JWT_SECRET, JWT_ALGORITHM, JWT_HEADER_NAME
+from core.consts import JWT_SECRET, JWT_ALGORITHM, JWT_HEADER_NAME, GOOGLE_APIS
 from core.errors import exceptions
 
 AUTH_HEADER = APIKeyHeader(name=JWT_HEADER_NAME)
@@ -38,7 +40,7 @@ def create_access_token(user_token: UserToken, expires_delta: int = None):  # TO
     return encoded_jwt
 
 
-async def get_kakao_user_profile(access_token: str) -> KakaoUserMeResponse:
+async def get_kakao_user_input(access_token: str) -> UserInput:  # noqa
     """
         GET/POST /v2/user/me HTTP/1.1
         Host: kapi.kakao.com
@@ -93,4 +95,34 @@ async def get_kakao_user_profile(access_token: str) -> KakaoUserMeResponse:
         logger.info(f'[auth kakao json]:{res.json()}')
         raise exceptions.TokenExpiredException(detail=f"kakao login failed access_token: {access_token}")
 
-    return KakaoUserMeResponse(**res.json())
+    auth_info = KakaoUserMeResponse(**res.json())
+    return UserInput(
+        email=auth_info.kakao_account.email,
+        name=auth_info.properties.nickname,
+        profile_img=auth_info.properties.profile_image,
+    )
+
+
+def get_frontend_callback_response(redirect_uri, code, state):
+    return RedirectResponse(
+        url=f'{redirect_uri}/?code={code}&state={state}',
+        status_code=302)
+
+
+async def get_google_user_input(access_token: str) -> UserInput:
+    url = GOOGLE_APIS['user_info'].format(access_token=access_token)
+    async with httpx.AsyncClient() as client:
+        res = await client.get(url)
+
+    try:
+        res.raise_for_status()
+    except httpx.HTTPStatusError as err:
+        logger.error(err)
+        raise exceptions.TokenExpiredException(detail=f"Google login failed access_token: {access_token}")
+
+    auth_info = GoogleAuthInfo(**res.json())
+    return UserInput(
+        email=auth_info.email,
+        name=auth_info.name,
+        profile_img=auth_info.picture,
+    )
