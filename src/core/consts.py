@@ -22,3 +22,7 @@ EXCEPT_PATH_LIST = ["/", "/openapi.json"]
 API_VERSION_PREFIX: str = "/api/v1"
 EXCEPT_PATH_REGEX = f"^(/docs|/redoc|{API_VERSION_PREFIX}/oauth)"
 JWT_HEADER_NAME = "tidify-oauth"
+
+GOOGLE_APIS = {
+    'user_info': 'https://openidconnect.googleapis.com/v1/userinfo?access_token={access_token}'
+}

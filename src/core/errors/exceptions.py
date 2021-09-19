@@ -167,3 +167,17 @@ class SqlFailureException(APIException):
             code=f"{StatusCode.HTTP_500}{'1'.zfill(4)}",
             ex=ex,
         )
+
+
+class GoogleOAuthError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Google OAuth Server Occured Error")
+
+
+class KakaoOAuthError(HTTPException):
+    def __init__(self, detail="Kakao OAuth Server Occured Error"):
+        super().__init__(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=detail)

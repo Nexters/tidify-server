@@ -7,9 +7,7 @@ from fastapi.logger import logger
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from app.services.user_svc import get_user_by_access_token
 from core.consts import EXCEPT_PATH_REGEX, EXCEPT_PATH_LIST, JWT_HEADER_NAME
-from core.errors import exceptions
 from core.errors.exceptions import SqlFailureException, APIException
 from core.utils.date_utils import D
 from core.utils.logger import api_logger
@@ -33,13 +31,6 @@ async def access_control(request: Request, call_next):
         return response
 
     try:
-        if url.startswith("/api"):
-            access_token = _get_access_token_from_header(headers)
-            logger.info(f'access_token:{access_token}')
-            if not access_token:
-                raise exceptions.UnAuthorizedException()
-            request.state.user = await get_user_by_access_token(access_token)  # TODO: 중복이므로 처리 필요
-
         response = await call_next(request)
         await api_logger(request=request, response=response)
     except Exception as e:
