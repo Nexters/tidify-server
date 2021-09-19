@@ -4,7 +4,7 @@ from pydantic import typing
 from sqlalchemy.orm import Session
 from starlette import status
 
-from app.models.models.bookmarks import BookmarkCreateRequest
+from app.models.bookmarks import BookmarkCreateRequest
 from core.consts import API_VERSION_PREFIX
 
 

@@ -2,7 +2,7 @@ import psycopg2
 import sqlalchemy
 from sqlalchemy.orm import Session
 
-from app.models.models.folders import FolderCreateRequest, FolderUpdateRequest
+from app.models.folders import FolderCreateRequest, FolderUpdateRequest
 from core.errors.exceptions import FolderDuplicateException
 from database.schema import Folders
 

@@ -2,13 +2,12 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, HttpUrl
 
-from app.models.base import OrmModel
-from app.models.models.folders import FolderDetailResponse
-from app.models.models.tags import TagDetailResponse
+from app.models.folders import FolderDetailResponse
+from app.models.tags import TagDetailResponse
 from core.consts import MaxLength
 
 
-class Bookmark(OrmModel):
+class Bookmark(BaseModel):
     id: int
     url: HttpUrl
     title: Optional[str] = Field(min_length=1, max_length=MaxLength.title)

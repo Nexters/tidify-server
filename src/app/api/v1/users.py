@@ -3,7 +3,7 @@ from fastapi.params import Depends
 from sqlalchemy.orm import Session
 from starlette.requests import Request  # noqa
 
-from app.models.models.users import UserMe
+from app.models.users import UserMe
 from app.services.auth_svc import AUTH_HEADER
 from app.services.user_svc import get_user_by_access_token
 from database.conn import db

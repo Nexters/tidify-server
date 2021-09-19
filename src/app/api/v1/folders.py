@@ -5,8 +5,8 @@ from fastapi_pagination.bases import AbstractPage
 from sqlalchemy.orm import Session
 
 from app.crud import folder_crud
-from app.models.models.folders import FolderDetailResponse, FolderCreateRequest, FolderUpdateRequest
-from app.models.models.users import UserMe
+from app.models.folders import FolderDetailResponse, FolderCreateRequest, FolderUpdateRequest
+from app.models.users import UserMe
 from app.services.user_svc import get_current_user
 from core.errors import exceptions
 from core.utils.query_utils import to_dict
@@ -72,4 +72,4 @@ async def delete_folder(
 
     if not folder.first():
         raise exceptions.FolderNotFoundException(folder_id=folder_id)
-    folder.delete(auto_commit=True)  # TODO: bookmark root 이동 여부 확인
+    folder.delete(auto_commit=True)  # TODO: bookmarks root 이동 여부 확인

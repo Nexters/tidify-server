@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 from starlette.requests import Request  # noqa
 
 from app.crud import bookmark_crud
-from app.models.models.bookmarks import BookmarkDetailResponse, BookmarkCreateRequest, \
+from app.models.bookmarks import BookmarkDetailResponse, BookmarkCreateRequest, \
     BookmarkUpdateRequest
-from app.models.models.users import UserMe
+from app.models.users import UserMe
 from app.services.user_svc import get_current_user
 from core.errors import exceptions
 from core.utils.query_utils import to_dict
@@ -18,7 +18,7 @@ from database.conn import db
 from database.schema import Bookmarks
 
 bookmark_router = APIRouter(prefix="/bookmarks")
-__valid_id = Path(..., title="The ID of bookmark to get", ge=1)
+__valid_id = Path(..., title="The ID of bookmarks to get", ge=1)
 
 
 @bookmark_router.get("/", response_model=Page[BookmarkDetailResponse])

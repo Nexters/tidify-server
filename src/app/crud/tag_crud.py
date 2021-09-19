@@ -4,7 +4,7 @@ import psycopg2
 import sqlalchemy
 from sqlalchemy.orm import Session
 
-from app.models.models.tags import TagCreateRequest, TagUpdateRequest
+from app.models.tags import TagCreateRequest, TagUpdateRequest
 from core.errors.exceptions import TagDuplicateException, InvalidTagIdExistException
 from database.schema import Tags
 
