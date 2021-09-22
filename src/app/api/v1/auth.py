@@ -95,18 +95,16 @@ async def redirect_google(request: Request):
 @auth_router.get('/apple')
 async def login(request: Request):
     http_redirect_uri = request.url_for('redirect_apple')
-    logger.info(http_redirect_uri)
     https_redirect_uri = http_redirect_uri.replace('http', 'https', 1)
-    logger.info(https_redirect_uri)
     return await oauth_client.apple.authorize_redirect(request=request, redirect_uri=https_redirect_uri)
 
 
 
 @auth_router.post("/redirect_apple")
-async def redirect_apple(request: Request, apple_redirect_auth_code: AppleRedirectAuthCode):
+async def redirect_apple(request: Request):
     try:
-        logger.info(apple_redirect_auth_code)
-        token = await oauth_client.apple.authorize_access_token(request, **apple_redirect_auth_code.dict())
+        logger.info(await request.json())
+        token = await oauth_client.apple.authorize_access_token(request)
         logger.info(token)
     except OAuthError as error:
         logger.error(error)
