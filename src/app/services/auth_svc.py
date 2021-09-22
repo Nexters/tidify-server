@@ -126,3 +126,24 @@ async def get_google_user_input(access_token: str) -> UserInput:
         name=auth_info.name,
         profile_img=auth_info.picture,
     )
+
+
+async def get_apple_user_input(access_token: str):
+    logger.info(f'apple access_token {access_token}')
+    pass
+    # url = GOOGLE_APIS['user_info'].format(access_token=access_token)
+    # async with httpx.AsyncClient() as client:
+    #     res = await client.get(url)
+    #
+    # try:
+    #     res.raise_for_status()
+    # except httpx.HTTPStatusError as err:
+    #     logger.error(err)
+    #     raise exceptions.TokenExpiredException(detail=f"Google login failed access_token: {access_token}")
+    #
+    # auth_info = GoogleAuthInfo(**res.json())
+    # return UserInput(
+    #     email=auth_info.email,
+    #     name=auth_info.name,
+    #     profile_img=auth_info.picture,
+    # )

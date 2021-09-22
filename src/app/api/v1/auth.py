@@ -11,7 +11,7 @@ from starlette.responses import JSONResponse  # noqa
 
 from app.crud import user_crud
 from app.models.users import Token, SnsType, CreateTokenRequest, UserInput, UserToken
-from app.services.auth_svc import create_access_token, get_kakao_user_input, get_google_user_input
+from app.services.auth_svc import create_access_token, get_kakao_user_input, get_google_user_input, get_apple_user_input
 from app.services.user_svc import sign_up_if_not_signed
 from core.config import get_conf
 from core.consts import Phase
@@ -24,16 +24,27 @@ auth_router = APIRouter(prefix="/oauth")
 
 
 def create_oauth_client():
-    # TODO: singleton check
-    config = Config(".google.env")
-    oauth = OAuth(config)
+    oauth = OAuth(Config())
     oauth.register(
         name='google',
+        client_id=os.environ.get('GOOGLE_CLIENT_ID'),
+        client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
         server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
         client_kwargs={
             'scope': 'openid email profile'
         }
     )
+
+    oauth.register(
+        name='apple',
+        client_id=os.environ.get('APPLE_CLIENT_ID'),
+        client_secret=os.environ.get('APPLE_CLIENT_SECRET'),
+        server_metadata_url='https://appleid.apple.com/.well-known/openid-configuration',
+        client_kwargs={
+            'scope': 'openid email name'
+        }
+    )  # apple은 profile image 없다.
+    # TODO: overwrite?
     return oauth
 
 
@@ -49,7 +60,7 @@ async def get_token(request: Request, token_request: CreateTokenRequest, session
     elif token_request.sns_type == SnsType.google:
         user_input = await get_google_user_input(token_request.access_token)
     elif token_request.sns_type == SnsType.apple:
-        pass
+        user_input = await get_apple_user_input(token_request.access_token)
     else:
         return JSONResponse(status_code=400, content=dict(msg="NOT_SUPPORTED"))
 
@@ -76,4 +87,21 @@ async def redirect_google(request: Request):
     except OAuthError as error:
         logger.error(error)
         raise exceptions.GoogleOAuthError()
+    return token
+
+
+@auth_router.get('/apple')
+async def login(request: Request):
+    redirect_uri = request.url_for('redirect_apple')
+    return await oauth_client.apple.authorize_redirect(request=request, redirect_uri=redirect_uri)
+
+
+@auth_router.get("/redirect_apple")
+async def redirect_apple(request: Request):
+    try:
+        token = await oauth_client.apple.authorize_access_token(request)
+        logger.info(token)
+    except OAuthError as error:
+        logger.error(error)
+        raise exceptions.AppleOAuthError()
     return token

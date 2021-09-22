@@ -173,11 +173,18 @@ class GoogleOAuthError(HTTPException):
     def __init__(self):
         super().__init__(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Google OAuth Server Occured Error")
+            detail="Google OAuth Server Error occurred")
 
 
 class KakaoOAuthError(HTTPException):
-    def __init__(self, detail="Kakao OAuth Server Occured Error"):
+    def __init__(self, detail="Kakao OAuth Server Error occurred"):
         super().__init__(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=detail)
+
+
+class AppleOAuthError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Apple OAuth Server Error occurred")

@@ -204,7 +204,7 @@ celerybeat.pid
 # Environments
 .env
 .env.*
-*/.google.*
+.oauth.env
 .venv
 env/
 venv/
@@ -253,3 +253,5 @@ cython_debug/
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,visualstudiocode
+
+*.p8
