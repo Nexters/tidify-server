@@ -51,3 +51,4 @@ $ heroku open
 - [heroku-docker-compose](https://devcenter.heroku.com/articles/local-development-with-docker-compose)
 - [many-to many in sqlalchemy with primary join](https://stackoverflow.com/questions/47327410/sqlalchemy-relationship-with-secondary-table-joining-behaviour-changes-between-l)
 - [search in sqlalchemy ilike](https://wikidocs.net/81067#_4)
+- [apple oauth heck](https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple)

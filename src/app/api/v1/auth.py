@@ -34,17 +34,18 @@ def create_oauth_client():
             'scope': 'openid email profile'
         }
     )
-
+    # https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple
     oauth.register(
         name='apple',
         client_id=os.environ.get('APPLE_CLIENT_ID'),
         client_secret=os.environ.get('APPLE_CLIENT_SECRET'),
         server_metadata_url='https://appleid.apple.com/.well-known/openid-configuration',
         client_kwargs={
+            'response_type': 'code',
+            'response_mode': 'form_post',
             'scope': 'openid email name'
         }
     )  # apple은 profile image 없다.
-    # TODO: overwrite?
     return oauth
 
 
