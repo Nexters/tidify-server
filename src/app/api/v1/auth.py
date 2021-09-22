@@ -10,6 +10,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse  # noqa
 
 from app.crud import user_crud
+from app.models.apple import AppleRedirectAuthCode
 from app.models.users import Token, SnsType, CreateTokenRequest, UserInput, UserToken
 from app.services.auth_svc import create_access_token, get_kakao_user_input, get_google_user_input, get_apple_user_input
 from app.services.user_svc import sign_up_if_not_signed
@@ -100,10 +101,12 @@ async def login(request: Request):
     return await oauth_client.apple.authorize_redirect(request=request, redirect_uri=https_redirect_uri)
 
 
-@auth_router.get("/redirect_apple")
-async def redirect_apple(request: Request):
+
+@auth_router.post("/redirect_apple")
+async def redirect_apple(request: Request, apple_redirect_auth_code: AppleRedirectAuthCode):
     try:
-        token = await oauth_client.apple.authorize_access_token(request)
+        logger.info(apple_redirect_auth_code)
+        token = await oauth_client.apple.authorize_access_token(request, **apple_redirect_auth_code.dict())
         logger.info(token)
     except OAuthError as error:
         logger.error(error)
