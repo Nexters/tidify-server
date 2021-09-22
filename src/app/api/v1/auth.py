@@ -103,7 +103,6 @@ async def login(request: Request):
 @auth_router.post("/redirect_apple")
 async def redirect_apple(request: Request):
     try:
-        logger.info(await request.json())
         token = await oauth_client.apple.authorize_access_token(request)
         logger.info(token)
     except OAuthError as error:
