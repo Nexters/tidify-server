@@ -26,3 +26,7 @@ JWT_HEADER_NAME = "tidify-oauth"
 GOOGLE_APIS = {
     'user_info': 'https://openidconnect.googleapis.com/v1/userinfo?access_token={access_token}'
 }
+
+APPLE_APIS = {
+    'user_info': 'https://openidconnect.googleapis.com/v1/userinfo?access_token={access_token}'
+}

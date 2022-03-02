@@ -99,10 +99,21 @@ async def login(request: Request):
     return await oauth_client.apple.authorize_redirect(request=request, redirect_uri=https_redirect_uri)
 
 
+# TODO
+"""
+2021-09-22T10:40:16.779877+00:00 app[web.1]: INFO:fastapi:{"url": "tidify.herokuapp.com/api/v1/oauth/redirect_apple", "method": "POST", "statusCode": 405, "errorDetail": null, "client": {"client": "222.117.150.228", "user": null, "email": null}, "processedTime": "0.43249ms", "datetimeUTC": "2021/09/22 10:40:16", "datetimeKST": "2021/09/22 19:40:16"}
+state: kYz1yStNwFFyHcMzCjY9lSM0BN5Ho1
+code: ca62d37cb39264662b936da6fbd697592.0.rruxq.Jmo2uU2ZSCTLnjiNOVHVXA
+
+
+2021-09-22T10:40:16.780302+00:00 app[web.1]: INFO:     10.1.16.228:33864 - "POST /api/v1/oauth/redirect_apple HTTP/1.1" 405 Method Not Allowed
+"""
+
 
 @auth_router.post("/redirect_apple")
-async def redirect_apple(request: Request):
+async def redirect_apple(request: Request, apple_redirect_auth_code: AppleRedirectAuthCode):
     try:
+        logger.info(apple_redirect_auth_code)
         token = await oauth_client.apple.authorize_access_token(request)
         logger.info(token)
     except OAuthError as error:
